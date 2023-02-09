@@ -24,6 +24,8 @@
             crossorigin="anonymous"></script> --}}
     @section('links')
     @show
+
+    @livewireStyles
 </head>
 <body class="antialiased">
     <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark">
@@ -217,12 +219,14 @@
       </div>
     </div>
 
-<!-- Libs JS -->
-<script src="{{ asset('dist/js/bootstrap.bundle.min.js') }}"></script>
-<!-- Tabler Core -->
-<script src="{{ asset('dist/js/tabler.min.js') }}"></script>
+  <!-- Libs JS -->
+  <script src="{{ asset('dist/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- Tabler Core -->
+  {{-- <script src="{{ asset('dist/js/tabler.min.js') }}"></script> --}}
 
-@section('scripts')
-@show
+  @livewireScripts
+
+  @section('scripts')
+  @show
 </body>
 </html>
