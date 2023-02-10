@@ -38,7 +38,7 @@
 @section('scripts')
 	
 
-    {{-- <script type="text/javascript">
+    <script type="text/javascript">
     	window.addEventListener('resetModalForm', function () {
     		document.getElementById('summary-form').reset();
     		const formSpans = document.querySelectorAll("#summary-form div.mb-3 span.text-danger");
@@ -46,6 +46,6 @@
     			formSpans[i].innerHTML = '';
     		}
     	})
-    </script> --}}
+    </script>
 @endsection
 
