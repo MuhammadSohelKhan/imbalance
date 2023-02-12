@@ -22,7 +22,7 @@
 					<tr>
 						{{-- <td>{{ $loop->iteration }}</td> --}}
 						<td>{{ $summary->id }}</td>
-						<td><a href="#" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
+						<td><a href="{{ route('lines', $summary->id) }}" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
 						<td class="text-muted">{{ $summary->buyer }}</td>
 						<td class="text-muted">{{ $summary->style }}</td>
 						<td class="text-muted">{{ $summary->item }}</td>
@@ -30,20 +30,7 @@
 					</tr>
 					@empty
 					<tr>
-            <td>2</td>
-						<td><a href="#" class="text-reset" tabindex="-1">Panacea Private Consulting Group</a></td>
-						<td class="text-muted">Target</td>
-						<td class="text-muted">Cb-101</td>
-						<td class="text-muted">Shirt</td>
-						<td class="text-muted">07 May 2020</td>
-					</tr>
-					<tr>
-            <td>1</td>
-						<td><a href="#" class="text-reset" tabindex="-1">Panacea Private Consulting Group</a></td>
-						<td class="text-muted">Target</td>
-						<td class="text-muted">Cb-101</td>
-						<td class="text-muted">Shirt</td>
-						<td class="text-muted">07 May 2020</td>
+            			<td colspan="6" class="text-center">No data found.</td>
 					</tr>
 					@endforelse
 				</tbody>
@@ -309,7 +296,7 @@
             </button>
             <button type="submit" class="btn btn-primary ml-auto">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Next
+              @if($currentStep == 4) {{ 'Finish' }} @else {{ 'Next' }} @endif
             </button>
           </div>
           </form>
