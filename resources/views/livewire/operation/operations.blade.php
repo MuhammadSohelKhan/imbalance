@@ -2,7 +2,7 @@
 	
 	<div class="card">
 		<div class="card-header justify-content-between">
-			<h4 class="card-title">Analysis of Line-1</h4>
+			<h4 class="card-title">Analysis of Line-{{ $line->line }}</h4>
       		<a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
