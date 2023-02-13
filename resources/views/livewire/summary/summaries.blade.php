@@ -3,7 +3,7 @@
 
 	<div class="card">
 		<div class="card-header">
-			<h4 class="card-title">Analytics of Summaries will be added here</h4>
+			<h4 class="card-title">List of New Summaries</h4>
 		</div>
 		<div class="table-responsive">
 			<table class="table table-vcenter card-table table-striped text-nowrap">
@@ -14,7 +14,8 @@
 						<th>Buyer</th>
 						<th>Style</th>
 						<th>Item</th>
-						<th class="w-1">Study Date</th>
+            <th>Study Date</th>
+						<th class="w-1">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -22,11 +23,12 @@
 					<tr>
 						{{-- <td>{{ $loop->iteration }}</td> --}}
 						<td>{{ $summary->id }}</td>
-						<td><a href="{{ route('lines', $summary->id) }}" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
+						<td><a href="{{ route('lines', $summary->id) }}" class="text-reset" tabindex="-1" title="Click to see Lines">{{ $summary->company }}</a></td>
 						<td class="text-muted">{{ $summary->buyer }}</td>
 						<td class="text-muted">{{ $summary->style }}</td>
 						<td class="text-muted">{{ $summary->item }}</td>
-						<td class="text-muted">{{ $summary->study_date }}</td>
+            <td class="text-muted">{{ $summary->study_date }}</td>
+            <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a></td>
 					</tr>
 					@empty
 					<tr>

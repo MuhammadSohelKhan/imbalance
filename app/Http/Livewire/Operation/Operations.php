@@ -15,7 +15,12 @@ class Operations extends Component
 
     public function render()
     {
-    	$line = Line::findOrFail($this->line_id);
+    	$line = Line::find($this->line_id);
+
+    	if (! $line) {
+    		return abort(404);
+    	}
+
     	$summary = Summary::findOrFail($line->summary_id);
     	$operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();
 

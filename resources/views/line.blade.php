@@ -4,9 +4,9 @@
 	<div class="page-header">
 		<div class="row align-items-center">
 			<div class="col-auto">
-				<h2 class="page-title">
+				<h2 class="page-title"><a href="{{ route('home') }}">
 					Dashboard
-				</h2>
+				</a></h2>
 			</div>
 		</div>
 	</div>
