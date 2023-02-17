@@ -45,20 +45,7 @@
 					</tr>
 					@empty
 					<tr>
-            <td>2</td>
-						<td><a href="#" class="text-reset" tabindex="-1">Panacea Private Consulting Group</a></td>
-						<td class="text-muted">Target</td>
-						<td class="text-muted">Cb-101</td>
-						<td class="text-muted">Shirt</td>
-						<td class="text-muted">07 May 2020</td>
-					</tr>
-					<tr>
-            <td>1</td>
-						<td><a href="#" class="text-reset" tabindex="-1">Panacea Private Consulting Group</a></td>
-						<td class="text-muted">Target</td>
-						<td class="text-muted">Cb-101</td>
-						<td class="text-muted">Shirt</td>
-						<td class="text-muted">07 May 2020</td>
+            <td colspan="6" class="text-center">No data found.</td>
 					</tr>
 					@endforelse
 				</tbody>
@@ -77,6 +64,22 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>
+          @if (session()->has('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <ul>
+                <li>{{ session()->get('success') }}</li>
+            </ul>
+            <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+        </div>
+      @endif
+      @if (session()->has('fail'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul>
+                <li>{{ session()->get('fail') }}</li>
+            </ul>
+            <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+        </div>
+      @endif
 
 
         {{-- START SUMMARY FORM --}}
@@ -281,73 +284,6 @@
           </form>
           @endif
         {{-- END OPERATION FORM --}}
-
-
-        {{-- START STAGEs FORM --}}
-          @if($currentStep == 4)
-          <form id="summary-form" wire:submit.prevent="saveLine">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">First</label>
-                  <input type="number" class="form-control" id="first" name="first" wire:model.lazy="first" placeholder="Write first number">
-                  <span class="text-danger">@error('first') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Second</label>
-                  <input type="number" class="form-control" id="second" name="second" wire:model.lazy="second" placeholder="Write second number">
-                  <span class="text-danger">@error('second') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Third</label>
-                  <input type="number" class="form-control" id="third" name="third" wire:model.lazy="third" placeholder="Write third amount">
-                  <span class="text-danger">@error('third') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Fourth</label>
-                  <input type="number" class="form-control" id="fourth" name="fourth" wire:model.lazy="fourth" placeholder="Write fourth amount">
-                  <span class="text-danger">@error('fourth') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Fifth</label>
-                  <input type="number" class="form-control" id="fifth" name="fifth" wire:model.lazy="fifth" placeholder="Write fifth amount">
-                  <span class="text-danger">@error('fifth') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Line ID</label>
-                  <input type="number" class="form-control" id="line_id" name="line_id" wire:model.lazy="line_id" disabled="true">
-                  <span class="text-danger">@error('line_id') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary ml-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Next
-            </button>
-          </div>
-          </form>
-          @endif
-        {{-- END STAGEs FORM --}}
         </div>
       </div>
     </div>

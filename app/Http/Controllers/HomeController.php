@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -46,5 +47,37 @@ class HomeController extends Controller
     public function operation($line_id)
     {
         return view('operation', compact('line_id'));
+    }
+
+    public function postChangePassword(Request $request)
+    {
+        $request->validate([
+            'current_password'=> [function ($attribute, $value, $fail) {
+                if (!Hash::check($value, auth()->user()->password)) {
+                    $fail('Current password not matched.');
+                }
+            }],
+            'password' => [function ($attr, $val, $fail)
+            {
+                if (Hash::check($val, auth()->user()->password)) {
+                    $fail('Old and New passwords are same.');
+                }
+            }, 'confirmed', 'min:8']
+            //'password' => 'confirmed|min:8',
+        ]);
+
+        $user = auth()->user();
+        if(isset($request->password)){
+            $user->password=Hash::make($request->password);
+        }
+
+        $user->save();
+        session()->flash('success', 'You have changed your password successfully!');
+        return redirect(route('home'));
+    }
+
+    public function getChangePasswordPage()
+    {
+        return view('auth.passwords.change_password');
     }
 }

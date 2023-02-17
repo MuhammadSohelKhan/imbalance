@@ -55,7 +55,6 @@ class Lines extends Component
         } else {
             $this->currentStep = 2;
             session()->flash('fail', 'Unable to save.');
-            dd('error in create.');
         }
     }
 

@@ -31,25 +31,7 @@ class Operations extends Component
     	$operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();
 
 
-
         return view('livewire.operation.operations', compact('line', 'summary', 'operations'));
-
-    	/*$operations = Operation::where('line_id', $this->line_id)->with(['stages', 'line:id,floor,line'])->withCount('stages')->orderBy('id', 'asc')->get();
-
-    	$minCapHour = Operation::select('capacity_per_hour')->orderBy('capacity_per_hour', 'asc')->where('line_id', $this->line_id)->where('capacity_per_hour', '!=', null)->first();
-
-    	if ($minCapHour) {
-    		$minCapacity = $minCapHour->capacity_per_hour;
-
-    		$line = Line::findOrFail($this->line_id);
-    		if ($line) {
-    			$line->update(['possible_output'=>$minCapacity]);
-    		}
-    	} else {
-    		$minCapacity = NULL;
-    	}*/
-
-        /*return view('livewire.operation.operations', compact('operations', 'minCapacity'));*/
     }
 
     public function resetModalForm()
@@ -57,6 +39,7 @@ class Operations extends Component
         $this->resetErrorBag();
         $this->resetAllPublicVariables();
         $this->currentStep = 3;
+        $this->dispatchBrowserEvent('DOMContentLoaded');
         $this->dispatchBrowserEvent('resetModalForm');
     }
 

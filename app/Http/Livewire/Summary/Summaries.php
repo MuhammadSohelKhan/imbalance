@@ -17,7 +17,7 @@ class Summaries extends Component
 	public $company, $buyer, $style, $item, $study_date, 
         $floor, $line, $allowance, $achieved, $summary_id,
         $type, $machine, $allocated_man_power, $line_id,
-        $step1, $step2, $step3, $step4, $step5, $operation_id;//$stages = [], $operation_id;
+        $step1, $step2, $step3, $step4, $step5, $operation_id;
 
     public function render()
     {
@@ -43,30 +43,26 @@ class Summaries extends Component
     		'item' => 'required|string',
     		'study_date' => 'required|date',
     	]);
-    	//return $summaryData;
 
     	$createdSummary = Summary::create($summaryData);
-        //dd($createdSummary);
 
     	if ($createdSummary) {
             $this->resetAllPublicVariables();
             $this->currentStep = 2;
             return $this->summary_id = $createdSummary->id;
-    		//session()->flash('success', 'Summary added!');
-    		//return redirect()->route('home');
     	} else {
             $this->currentStep = 1;
-    		dd('error in create.');
+    		session()->flash('fail', 'Unable to save.');
     	}
     }
 
     public function saveLine()
     {
         $lineData = $this->validate([
-            'floor' => 'required|integer|min:1|max:20',
-            'line' => 'required|integer|min:1|max:50',
-            'allowance' => 'required|integer|min:1|max:50',
-            'achieved' => 'required|integer|min:40|max:90',
+            'floor' => 'required|integer|min:1',
+            'line' => 'required|integer|min:1',
+            'allowance' => 'required|integer|min:1',
+            'achieved' => 'required|integer|min:1',
             'summary_id' => 'required|exists:summaries,id',
         ]);
 
@@ -78,7 +74,7 @@ class Summaries extends Component
             return $this->line_id = $createdLine->id;
         } else {
             $this->currentStep = 2;
-            dd('error in create.');
+            session()->flash('fail', 'Unable to save.');
         }
     }
 
@@ -87,7 +83,7 @@ class Summaries extends Component
         $operationData = $this->validate([
             'type' => 'required|string',
             'machine' => 'required|string',
-            'allocated_man_power' => 'required|integer|min:1|max:5',
+            'allocated_man_power' => 'required|integer|min:1',
             'line_id' => 'required|exists:lines,id',
         ]);
 
@@ -157,8 +153,8 @@ class Summaries extends Component
                 return $this->line_id = $createdOperation->line_id;
             }
         } else {
-            $this->currentStep = 2;
-            dd('error in create.');
+            $this->currentStep = 3;
+            session()->flash('fail', 'Unable to save.');
         }
     }
 

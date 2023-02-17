@@ -75,7 +75,7 @@
     }
 
     function resetTimer(resetter) {
-      console.log(stepsCount);
+      //console.log(stepsCount);
       document.getElementById('step'+stepsCount).value = elmTimer.innerHTML;
       elmTimer.innerHTML = '00:00';
       resetter.innerHTML = 'Play';
@@ -126,18 +126,8 @@
       	btnElem.innerHTML = 'Play';
       	btnElem.setAttribute('class', 'col-2 offset-5 text-white btn btn-warning');
       	btnElem.setAttribute('onclick', 'event.preventDefault(); startTimer(this)');
-    	console.log(btnElem);
+    	//console.log(btnElem);
     }
   </script>
 
-    {{-- <script type="text/javascript">
-    	window.addEventListener('resetModalForm', function () {
-    		document.getElementById('summary-form').reset();
-    		const formSpans = document.querySelectorAll("#summary-form div.mb-3 span.text-danger");
-    		for (var i = 0; i < formSpans.length; i++) {
-    			formSpans[i].innerHTML = '';
-    		}
-    	})
-    </script> --}}
 @endsection
-

@@ -164,8 +164,6 @@
 	@endif
 
 
-
-
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -278,145 +276,87 @@
         {{-- END OPERATION FORM --}}
 
 
-        {{-- START STAGEs FORM --}}
-          @if($currentStep == 4)
-          <form id="summary-form" wire:submit.prevent="saveLine">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">First</label>
-                  <input type="number" class="form-control" id="first" name="first" wire:model.lazy="first" placeholder="Write first number">
-                  <span class="text-danger">@error('first') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Second</label>
-                  <input type="number" class="form-control" id="second" name="second" wire:model.lazy="second" placeholder="Write second number">
-                  <span class="text-danger">@error('second') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Third</label>
-                  <input type="number" class="form-control" id="third" name="third" wire:model.lazy="third" placeholder="Write third amount">
-                  <span class="text-danger">@error('third') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Fourth</label>
-                  <input type="number" class="form-control" id="fourth" name="fourth" wire:model.lazy="fourth" placeholder="Write fourth amount">
-                  <span class="text-danger">@error('fourth') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Fifth</label>
-                  <input type="number" class="form-control" id="fifth" name="fifth" wire:model.lazy="fifth" placeholder="Write fifth amount">
-                  <span class="text-danger">@error('fifth') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Line ID</label>
-                  <input type="number" class="form-control" id="line_id" name="line_id" wire:model.lazy="line_id" disabled="true">
-                  <span class="text-danger">@error('line_id') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary ml-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Next
-            </button>
-          </div>
-          </form>
-          @endif
-        {{-- END STAGEs FORM --}}
         </div>
       </div>
     </div>
 
-</div>
 
-
-
-
-{{-- <div class="box">
-
-
+	{{-- Capacity Graph --}}
 	<div class="card">
-		<div class="card-header">
-			<h4 class="card-title">Analysis of Line-{{ (count($operations)) ? $operations[0]->line->line : '' }}</h4>
-		</div>
-		<div class="table-responsive">
-			<table class="table table-vcenter card-table table-striped table-bordered text-center">
-				<thead>
-					<tr>
-						<th>SL</th>
-						<th>Type</th>
-						<th>Machine</th>
-						<th>Avg Cycle Time</th>
-						<th>Cycle Time With Allowance</th>
-						<th>Allocated MP</th>
-						<th>Dedicated Cycle Time</th>
-						<th>Capacity Per Hour</th>
-						<th>Possible Output</th>
-						<th>Minutes Lost Per Hour</th>
-
-						<th class="px-4" style="border-bottom-color: #fff;"></th>
-
-						@for($s=1;$s<=$operations->max('stages_count');$s++)
-						<th class="w-1" colspan="5">Operation-{{ $s }}</th>
-						@endfor
-					</tr>
-				</thead>
-				<tbody class=" text-nowrap">
-					@forelse($operations as $operation)
-					<tr>
-						<td>{{ $loop->iteration }}</td>
-						<td>{{ $operation->type }}</td>
-						<td>{{ $operation->machine }}</td>
-						<td>{{ $operation->average_cycle_time }}</td>
-						<td>{{ $operation->cycle_time_with_allowance }}</td>
-						<td>{{ $operation->allocated_man_power }}</td>
-						<td>{{ $operation->dedicated_cycle_time }}</td>
-						<td>{{ $operation->capacity_per_hour }}</td>
-						<td>{{ $minCapacity ?? '' }}</td>
-						<td>{{ round(($operation->capacity_per_hour - $minCapacity) * $operation->cycle_time_with_allowance) }}</td>
-
-						<td class="px-4" style="border-top-color: #fff; border-bottom-color: #fff;"></td>
-
-						@forelse($operation->stages as $stage)
-						<td class="text-muted">{{ $stage->first }}</td>
-						<td class="text-muted">{{ $stage->second }}</td>
-						<td class="text-muted">{{ $stage->third }}</td>
-						<td class="text-muted">{{ $stage->fourth }}</td>
-						<td class="text-muted">{{ $stage->fifth }}</td>
-						@empty
-						<td colspan="5"></td>
-						@endforelse
-					</tr>
-					@empty
-					<tr>
-            			<td colspan="10" class="text-center">No data found.</td>
-					</tr>
-					@endforelse
-				</tbody>
-			</table>
+		<div class="card-body">
+			<h3 class="card-title text-center">Capacity Graph</h3>
+			<div id="chart-capacity-overview"></div>
 		</div>
 	</div>
+	{{-- Capacity Graph --}}
 
 
 
-</div> --}}
+    <script type="text/javascript" src="{{ asset('dist/apexcharts/dist/apexcharts.min.js') }}"></script>
+    <script>
+      // @formatter:off
+      document.addEventListener("DOMContentLoaded", function () {
+      	window.ApexCharts && (new ApexCharts(document.getElementById('chart-capacity-overview'), {
+      		chart: {
+      			type: "bar",
+      			fontFamily: 'inherit',
+      			height: 320,
+      			parentHeightOffset: 0,
+      			toolbar: {
+      				show: false,
+      			},
+      			animations: {
+      				enabled: false
+      			},
+      		},
+      		plotOptions: {
+      			bar: {
+      				columnWidth: '80%',
+      			}
+      		},
+      		dataLabels: {
+      			enabled: true,
+      		},
+      		fill: {
+      			opacity: 1,
+      		},
+      		series: [{
+      			name: "Capacity/hr",
+      			data: [@foreach($operations as $opr) {{ round($opr->capacity_per_hour) ?? 0 }}, @endforeach]
+      		}],
+      		grid: {
+      			padding: {
+      				top: -20,
+      				right: 0,
+      				left: -4,
+      				bottom: -4
+      			},
+      			strokeDashArray: 4,
+      		},
+      		xaxis: {
+      			labels: {
+      				padding: 0
+      			},
+      			tooltip: {
+      				enabled: false
+      			},
+      			axisBorder: {
+      				show: false,
+      			},
+      			categories: [@foreach($operations as $opr) "{{ $opr->type }}", @endforeach],
+      		},
+      		yaxis: {
+      			labels: {
+      				padding: 4
+      			},
+      		},
+      		colors: ["#206bc4"],
+      		legend: {
+      			show: false,
+      		},
+      	})).render();
+      });
+      // @formatter:on
+    </script>
+
+</div>
