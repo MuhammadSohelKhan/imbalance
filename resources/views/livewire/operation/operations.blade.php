@@ -1,4 +1,5 @@
 <div class="box">
+
   <style type="text/css">
     #operation1, #operation2, #operation3, #operation4, #operation5 {
       position: relative;
@@ -13,190 +14,184 @@
       z-index: 100;
     }
   </style>
-
+	
 	<div class="card">
-		<div class="card-header">
-			<h4 class="card-title">Analytics of Summaries will be added here</h4>
+		<div class="card-header justify-content-between">
+			<h4 class="card-title">Analysis of Line-{{ $line->line }}</h4>
+      		<a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
-			<table class="table table-vcenter card-table table-striped text-nowrap">
+			<table class="table table-vcenter card-table table-striped table-bordered text-center">
 				<thead>
+					<tr style="background-color: #b7dee8;">
+						<th colspan="9" style="font-size: 1.2rem; font-weight: bolder;">Imbalance check <br>{{ $summary->company }}</th>
+						<th style="font-size: 1.2rem; vertical-align: middle; background-color: #FABF8F; padding-right: .5rem;"><a href="{{ route('lines', $summary->id) }}"><u>Back</u></a></th>
+					</tr>
 					<tr>
-						<th>SL</th>
-						<th>Company</th>
-						<th>Buyer</th>
-						<th>Style</th>
-						<th>Item</th>
-						<th class="w-1">Study Date</th>
-            <th class="w-1">Action</th>
+						<th colspan="2">Buyer</th>
+						<th>{{ $summary->buyer }}</th>
+
+						<th style="border-bottom-color: #fff;"></th>
+						<th>Floor</th>
+						<th>{{ $line->floor }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th colspan="2">Possible Output</th>
+						<th>{{ $operations->min('capacity_per_hour') }}</th>
+					</tr>
+					<tr>
+						<th colspan="2">Style</th>
+						<th>{{ $summary->style }}</th>
+
+						<th style="border-bottom-color: #fff;"></th>
+						<th>Line</th>
+						<th>{{ $line->line }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th colspan="2">Achieved</th>
+						<th>{{ $line->achieved }}</th>
+					</tr>
+					<tr>
+						<th colspan="2">Item</th>
+						<th>{{ $summary->item }}</th>
+
+						<th style="border-bottom-color: #fff;"></th>
+						<th>Study Date</th>
+						<th>{{ $summary->study_date }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th colspan="2">Imbalance</th>
+						<th id="imbalanceCell"></th>
+					</tr>
+					<tr>
+						<th colspan="2"></th>
+						<th></th>
+
+						<th></th>
+						<th>Allowance</th>
+						<th>{{ $line->allowance }}%</th>
+						<th></th>
+						<th colspan="2">Balance</th>
+						<th id="balanceCell"></th>
 					</tr>
 				</thead>
-				<tbody>
-					@forelse($summaries as $summary)
+				<thead>
 					<tr>
-						{{-- <td>{{ $loop->iteration }}</td> --}}
-						<td>{{ $summary->id }}</td>
-						<td><a href="{{ route('lines', $summary->id)}}" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
-						<td class="text-muted">{{ $summary->buyer }}</td>
-						<td class="text-muted">{{ $summary->style }}</td>
-						<td class="text-muted">{{ $summary->item }}</td>
-						<td class="text-muted">{{ $summary->study_date }}</td>
-            <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a></td>
+						<th style="background-color: #b7dee8;">SL</th>
+						<th style="background-color: #b7dee8;">Type</th>
+						<th style="background-color: #b7dee8;">Machine</th>
+						<th style="background-color: #b7dee8;">Avg Cycle Time</th>
+						<th style="background-color: #b7dee8;">Cycle Time With Allowance</th>
+						<th style="background-color: #b7dee8;">Allocated MP</th>
+						<th style="background-color: #b7dee8;">Dedicated Cycle Time</th>
+						<th style="background-color: #b7dee8;">Capacity Per Hour</th>
+						<th style="background-color: #b7dee8;">Possible Output</th>
+						<th style="background-color: #b7dee8;">Minutes Lost Per Hour</th>
+
+						<th class="px-4" style="border-bottom-color: #fff;"></th>
+
+						@for($s=1;$s<=$operations->max('stages_count');$s++)
+						<th class="w-1" colspan="5">Operation-{{ $s }}</th>
+						@endfor
+					</tr>
+				</thead>
+				<tbody class=" text-nowrap">
+					@php 
+					$totalLostMin = 0;
+					$minCapacity = $operations->min('capacity_per_hour'); 
+					$totalMP = $operations->sum('allocated_man_power'); 
+					@endphp
+					@forelse($operations as $operation)
+					<tr>
+						<td>{{ $loop->iteration }}</td>
+						<td>{{ $operation->type }}</td>
+						<td>{{ $operation->machine }}</td>
+						<td>{{ $operation->average_cycle_time }}</td>
+						<td>{{ $operation->cycle_time_with_allowance }}</td>
+						<td>{{ $operation->allocated_man_power }}</td>
+						<td>{{ $operation->dedicated_cycle_time }}</td>
+						<td>{{ round($operation->capacity_per_hour) }}</td>
+						<td>{{ round($minCapacity) ?? '' }}</td>
+						@php 
+						$capDiff = ($operation->capacity_per_hour - $minCapacity) * $operation->cycle_time_with_allowance;
+						$totalLostMin += $capDiff;
+						@endphp
+						<td>{{ round($capDiff) }}</td>
+
+						<td class="px-4" style="border-top-color: #fff; border-bottom-color: #fff;"></td>
+
+						@forelse($operation->stages as $stage)
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->first }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->second }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->third }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->fourth }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->fifth }}</td>
+						@empty
+						<td colspan="5" style="//background-color: #CCC0DA;"></td>
+						@endforelse
 					</tr>
 					@empty
 					<tr>
-            <td>2</td>
-						<td><a href="#" class="text-reset" tabindex="-1">Panacea Private Consulting Group</a></td>
-						<td class="text-muted">Target</td>
-						<td class="text-muted">Cb-101</td>
-						<td class="text-muted">Shirt</td>
-						<td class="text-muted">07 May 2020</td>
-					</tr>
-					<tr>
-            <td>1</td>
-						<td><a href="#" class="text-reset" tabindex="-1">Panacea Private Consulting Group</a></td>
-						<td class="text-muted">Target</td>
-						<td class="text-muted">Cb-101</td>
-						<td class="text-muted">Shirt</td>
-						<td class="text-muted">07 May 2020</td>
+            			<td colspan="10" class="text-center">No data found.</td>
 					</tr>
 					@endforelse
 				</tbody>
+				<tfoot style="font-weight: bolder;">
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td>{{ $totalMP }}</td>
+						<td></td>
+						<td>{{ round($operations->avg('capacity_per_hour')) }}</td>
+						<td>{{ round($minCapacity) }}</td>
+						<td>{{ round($totalLostMin) }}</td>
+					</tr>
+				</tfoot>
 			</table>
 		</div>
 	</div>
 
+	@if(count($operations))
+	@php
+	$imbalance = $totalLostMin / ($totalMP * 60);
+	$balance = 1 - $imbalance;
+	@endphp
+
+	<script type="text/javascript">
+		document.getElementById('imbalanceCell').innerHTML = {{ round($imbalance * 100)}}+'%';
+		document.getElementById('balanceCell').innerHTML = {{ round($balance * 100) }}+'%';
+	</script>
+	@endif
 
 
-	<div class="modal modal-blur fade" wire:ignore.self id="modal-summary-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+
+
+	<div class="modal modal-blur fade" wire:ignore.self id="modal-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">New Line Imbalance Operation</h5>
+            <h5 class="modal-title">New Line Operation</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>
+          @if (session()->has('success'))
+		    <div class="alert alert-success alert-dismissible" role="alert">
+		        <ul>
+		            <li>{{ session()->get('success') }}</li>
+		        </ul>
+		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+		    </div>
+		  @endif
+		  @if (session()->has('fail'))
+		    <div class="alert alert-danger alert-dismissible" role="alert">
+		        <ul>
+		            <li>{{ session()->get('fail') }}</li>
+		        </ul>
+		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+		    </div>
+		  @endif
 
-
-        {{-- START SUMMARY FORM --}}
-          @if($currentStep == 1)
-          <form id="summary-form" wire:submit.prevent="saveSummary">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Company</label>
-                  <input type="text" class="form-control" id="company" name="company" wire:model.lazy="company" placeholder="Write company name">
-                  <span class="text-danger">@error('company') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Buyer</label>
-                  <input type="text" class="form-control" id="buyer" name="buyer" wire:model.lazy="buyer" placeholder="Write buyer name">
-                  <span class="text-danger">@error('buyer') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Style</label>
-                  <input type="text" class="form-control" id="style" name="style" wire:model.lazy="style" placeholder="Write style name">
-                  <span class="text-danger">@error('style') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Item</label>
-                  <input type="text" class="form-control" id="item" name="item" wire:model.lazy="item" placeholder="Write item name">
-                  <span class="text-danger">@error('item') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Study Date</label>
-                  <input type="date" class="form-control" id="study_date" name="study_date" wire:model.lazy="study_date" placeholder="Write study date">
-                  <span class="text-danger">@error('study_date') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary ml-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Next
-            </button>
-          </div>
-          </form>
-          @endif
-        {{-- END SUMMARY FORM --}}
-
-
-        {{-- START LINE FORM --}}
-          @if($currentStep == 2)
-          <form id="summary-form" wire:submit.prevent="saveLine">
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Floor</label>
-                  <input type="number" class="form-control" id="floor" name="floor" wire:model.lazy="floor" placeholder="Write floor number">
-                  <span class="text-danger">@error('floor') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Line</label>
-                  <input type="number" class="form-control" id="line" name="line" wire:model.lazy="line" placeholder="Write line number">
-                  <span class="text-danger">@error('line') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Allowance</label>
-                  <input type="number" class="form-control" id="allowance" name="allowance" wire:model.lazy="allowance" placeholder="Write allowance amount">
-                  <span class="text-danger">@error('allowance') {{ $message }} @enderror</span>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Achieved</label>
-                  <input type="number" class="form-control" id="achieved" name="achieved" wire:model.lazy="achieved" placeholder="Write achieved amount">
-                  <span class="text-danger">@error('achieved') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Summary ID</label>
-                  <input type="number" class="form-control" id="summary_id" name="summary_id" wire:model.lazy="summary_id" disabled="true">
-                  <span class="text-danger">@error('summary_id') {{ $message }} @enderror</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary ml-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Next
-            </button>
-          </div>
-          </form>
-          @endif
-        {{-- END LINE FORM --}}
 
 
         {{-- START OPERATION FORM --}}
@@ -351,4 +346,77 @@
         </div>
       </div>
     </div>
+
 </div>
+
+
+
+
+{{-- <div class="box">
+
+
+	<div class="card">
+		<div class="card-header">
+			<h4 class="card-title">Analysis of Line-{{ (count($operations)) ? $operations[0]->line->line : '' }}</h4>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-vcenter card-table table-striped table-bordered text-center">
+				<thead>
+					<tr>
+						<th>SL</th>
+						<th>Type</th>
+						<th>Machine</th>
+						<th>Avg Cycle Time</th>
+						<th>Cycle Time With Allowance</th>
+						<th>Allocated MP</th>
+						<th>Dedicated Cycle Time</th>
+						<th>Capacity Per Hour</th>
+						<th>Possible Output</th>
+						<th>Minutes Lost Per Hour</th>
+
+						<th class="px-4" style="border-bottom-color: #fff;"></th>
+
+						@for($s=1;$s<=$operations->max('stages_count');$s++)
+						<th class="w-1" colspan="5">Operation-{{ $s }}</th>
+						@endfor
+					</tr>
+				</thead>
+				<tbody class=" text-nowrap">
+					@forelse($operations as $operation)
+					<tr>
+						<td>{{ $loop->iteration }}</td>
+						<td>{{ $operation->type }}</td>
+						<td>{{ $operation->machine }}</td>
+						<td>{{ $operation->average_cycle_time }}</td>
+						<td>{{ $operation->cycle_time_with_allowance }}</td>
+						<td>{{ $operation->allocated_man_power }}</td>
+						<td>{{ $operation->dedicated_cycle_time }}</td>
+						<td>{{ $operation->capacity_per_hour }}</td>
+						<td>{{ $minCapacity ?? '' }}</td>
+						<td>{{ round(($operation->capacity_per_hour - $minCapacity) * $operation->cycle_time_with_allowance) }}</td>
+
+						<td class="px-4" style="border-top-color: #fff; border-bottom-color: #fff;"></td>
+
+						@forelse($operation->stages as $stage)
+						<td class="text-muted">{{ $stage->first }}</td>
+						<td class="text-muted">{{ $stage->second }}</td>
+						<td class="text-muted">{{ $stage->third }}</td>
+						<td class="text-muted">{{ $stage->fourth }}</td>
+						<td class="text-muted">{{ $stage->fifth }}</td>
+						@empty
+						<td colspan="5"></td>
+						@endforelse
+					</tr>
+					@empty
+					<tr>
+            			<td colspan="10" class="text-center">No data found.</td>
+					</tr>
+					@endforelse
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+
+
+</div> --}}

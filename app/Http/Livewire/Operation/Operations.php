@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Summary;
+namespace App\Http\Livewire\Operation;
 
 use Livewire\Component;
 
@@ -9,77 +9,55 @@ use App\Models\Line;
 use App\Models\Operation;
 use App\Models\Stage;
 
-class Summaries extends Component
+class Operations extends Component
 {
-    public $currentStep = 1;
+    public $currentStep = 3;
     public $totalStep = 3;
     public $keep_data = 1;
-	public $company, $buyer, $style, $item, $study_date, 
-        $floor, $line, $allowance, $achieved, $summary_id,
-        $type, $machine, $allocated_man_power, $line_id,
-        $step1, $step2, $step3, $step4, $step5, $operation_id;//$stages = [], $operation_id;
+	public $line_id,
+        $type, $machine, $allocated_man_power,
+        $step1, $step2, $step3, $step4, $step5, $operation_id;
 
     public function render()
     {
         $this->dispatchBrowserEvent('refreshJSVariables');
-    	$summaries = Summary::orderBy('id', 'desc')->limit(10)->get();
-        return view('livewire.summary.summaries', compact('summaries'));
+    	$line = Line::find($this->line_id);
+
+    	if (! $line) {
+    		return abort(404);
+    	}
+
+    	$summary = Summary::findOrFail($line->summary_id);
+    	$operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();
+
+
+
+        return view('livewire.operation.operations', compact('line', 'summary', 'operations'));
+
+    	/*$operations = Operation::where('line_id', $this->line_id)->with(['stages', 'line:id,floor,line'])->withCount('stages')->orderBy('id', 'asc')->get();
+
+    	$minCapHour = Operation::select('capacity_per_hour')->orderBy('capacity_per_hour', 'asc')->where('line_id', $this->line_id)->where('capacity_per_hour', '!=', null)->first();
+
+    	if ($minCapHour) {
+    		$minCapacity = $minCapHour->capacity_per_hour;
+
+    		$line = Line::findOrFail($this->line_id);
+    		if ($line) {
+    			$line->update(['possible_output'=>$minCapacity]);
+    		}
+    	} else {
+    		$minCapacity = NULL;
+    	}*/
+
+        /*return view('livewire.operation.operations', compact('operations', 'minCapacity'));*/
     }
 
     public function resetModalForm()
     {
-    	$this->resetErrorBag();
-    	$this->resetAllPublicVariables();
-        $this->currentStep = 1;
-    	$this->dispatchBrowserEvent('resetModalForm');
-    }
-
-    public function saveSummary()
-    {
-    	$summaryData = $this->validate([
-    		'company' => 'required|string',
-    		'buyer' => 'required|string',
-    		'style' => 'required|string',
-    		'item' => 'required|string',
-    		'study_date' => 'required|date',
-    	]);
-    	//return $summaryData;
-
-    	$createdSummary = Summary::create($summaryData);
-        //dd($createdSummary);
-
-    	if ($createdSummary) {
-            $this->resetAllPublicVariables();
-            $this->currentStep = 2;
-            return $this->summary_id = $createdSummary->id;
-    		//session()->flash('success', 'Summary added!');
-    		//return redirect()->route('home');
-    	} else {
-            $this->currentStep = 1;
-    		dd('error in create.');
-    	}
-    }
-
-    public function saveLine()
-    {
-        $lineData = $this->validate([
-            'floor' => 'required|integer|min:1|max:20',
-            'line' => 'required|integer|min:1|max:50',
-            'allowance' => 'required|integer|min:1|max:50',
-            'achieved' => 'required|integer|min:40|max:90',
-            'summary_id' => 'required|exists:summaries,id',
-        ]);
-
-        $createdLine = Line::create($lineData);
-
-        if ($createdLine) {
-            $this->resetAllPublicVariables();
-            $this->currentStep = 3;
-            return $this->line_id = $createdLine->id;
-        } else {
-            $this->currentStep = 2;
-            dd('error in create.');
-        }
+        $this->resetErrorBag();
+        $this->resetAllPublicVariables();
+        $this->currentStep = 3;
+        $this->dispatchBrowserEvent('resetModalForm');
     }
 
     public function saveOperation($data)
@@ -87,7 +65,7 @@ class Summaries extends Component
         $operationData = $this->validate([
             'type' => 'required|string',
             'machine' => 'required|string',
-            'allocated_man_power' => 'required|integer|min:1|max:5',
+            'allocated_man_power' => 'required|integer|min:1',
             'line_id' => 'required|exists:lines,id',
         ]);
 
@@ -154,37 +132,21 @@ class Summaries extends Component
 
                 $this->currentStep = 3;
                 $this->dispatchBrowserEvent('refreshJSVariables');
+                session()->flash('success', 'Data saved successfully.');
                 return $this->line_id = $createdOperation->line_id;
             }
         } else {
-            $this->currentStep = 2;
-            dd('error in create.');
+            $this->currentStep = 3;
+            session()->flash('fail', 'Unable to save.');
         }
     }
 
     public function resetAllPublicVariables()
     {
-        # Summary variables
-    	$this->company = null;
-		$this->buyer = null;
-		$this->style = null;
-		$this->item = null;
-		$this->study_date = null;
-
-
-        # Line variables
-        $this->floor = null;
-        $this->line = null;
-        $this->allowance = null;
-        $this->achieved = null;
-        $this->summary_id = null;
-
-
         # Operation variables
         $this->type = null;
         $this->machine = null;
         $this->allocated_man_power = null;
-        $this->line_id = null;
 
 
         # Stage variables

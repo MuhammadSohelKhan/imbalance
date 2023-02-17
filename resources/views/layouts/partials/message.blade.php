@@ -1,14 +1,14 @@
 @if (session()->has('success'))
     <div class="alert alert-success">
         <ul>
-                <li>{{ session()->get('success') }}</li>
+            <li>{{ session()->get('success') }}</li>
         </ul>
     </div>
 @endif
 @if (session()->has('fail'))
     <div class="alert alert-danger">
         <ul>
-                <li>{{ session()->get('fail') }}</li>
+            <li>{{ session()->get('fail') }}</li>
         </ul>
     </div>
 @endif

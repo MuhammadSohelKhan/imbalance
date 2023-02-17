@@ -10,4 +10,14 @@ class Operation extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function line()
+    {
+    	return $this->belongsTo(Line::class);
+    }
+
+    public function stages()
+    {
+    	return $this->hasMany(Stage::class);
+    }
 }

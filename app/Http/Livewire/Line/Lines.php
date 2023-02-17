@@ -1,72 +1,47 @@
 <?php
 
-namespace App\Http\Livewire\Summary;
+namespace App\Http\Livewire\Line;
 
 use Livewire\Component;
 
-use App\Models\Summary;
 use App\Models\Line;
 use App\Models\Operation;
 use App\Models\Stage;
 
-class Summaries extends Component
+class Lines extends Component
 {
-    public $currentStep = 1;
+    public $currentStep = 2;
     public $totalStep = 3;
     public $keep_data = 1;
-	public $company, $buyer, $style, $item, $study_date, 
-        $floor, $line, $allowance, $achieved, $summary_id,
+	public $summary_id,
+		$floor, $line, $allowance, $achieved,
         $type, $machine, $allocated_man_power, $line_id,
-        $step1, $step2, $step3, $step4, $step5, $operation_id;//$stages = [], $operation_id;
+        $step1, $step2, $step3, $step4, $step5, $operation_id;
 
     public function render()
     {
         $this->dispatchBrowserEvent('refreshJSVariables');
-    	$summaries = Summary::orderBy('id', 'desc')->limit(10)->get();
-        return view('livewire.summary.summaries', compact('summaries'));
+    	$lines = Line::where('summary_id', $this->summary_id)->orderBy('id', 'asc')->get();
+    	if ($lines) {
+    		return view('livewire.line.lines', compact('lines'));
+    	}
     }
 
     public function resetModalForm()
     {
     	$this->resetErrorBag();
     	$this->resetAllPublicVariables();
-        $this->currentStep = 1;
+        $this->currentStep = 2;
     	$this->dispatchBrowserEvent('resetModalForm');
-    }
-
-    public function saveSummary()
-    {
-    	$summaryData = $this->validate([
-    		'company' => 'required|string',
-    		'buyer' => 'required|string',
-    		'style' => 'required|string',
-    		'item' => 'required|string',
-    		'study_date' => 'required|date',
-    	]);
-    	//return $summaryData;
-
-    	$createdSummary = Summary::create($summaryData);
-        //dd($createdSummary);
-
-    	if ($createdSummary) {
-            $this->resetAllPublicVariables();
-            $this->currentStep = 2;
-            return $this->summary_id = $createdSummary->id;
-    		//session()->flash('success', 'Summary added!');
-    		//return redirect()->route('home');
-    	} else {
-            $this->currentStep = 1;
-    		dd('error in create.');
-    	}
     }
 
     public function saveLine()
     {
         $lineData = $this->validate([
-            'floor' => 'required|integer|min:1|max:20',
-            'line' => 'required|integer|min:1|max:50',
-            'allowance' => 'required|integer|min:1|max:50',
-            'achieved' => 'required|integer|min:40|max:90',
+            'floor' => 'required|integer|min:1',
+            'line' => 'required|integer|min:1',
+            'allowance' => 'required|integer|min:1',
+            'achieved' => 'required|integer|min:1',
             'summary_id' => 'required|exists:summaries,id',
         ]);
 
@@ -75,9 +50,11 @@ class Summaries extends Component
         if ($createdLine) {
             $this->resetAllPublicVariables();
             $this->currentStep = 3;
+            session()->flash('success', 'Line saved successfully!');
             return $this->line_id = $createdLine->id;
         } else {
             $this->currentStep = 2;
+            session()->flash('fail', 'Unable to save.');
             dd('error in create.');
         }
     }
@@ -87,7 +64,7 @@ class Summaries extends Component
         $operationData = $this->validate([
             'type' => 'required|string',
             'machine' => 'required|string',
-            'allocated_man_power' => 'required|integer|min:1|max:5',
+            'allocated_man_power' => 'required|integer|min:1',
             'line_id' => 'required|exists:lines,id',
         ]);
 
@@ -154,30 +131,22 @@ class Summaries extends Component
 
                 $this->currentStep = 3;
                 $this->dispatchBrowserEvent('refreshJSVariables');
+                session()->flash('success', 'Data saved successfully.');
                 return $this->line_id = $createdOperation->line_id;
             }
         } else {
-            $this->currentStep = 2;
-            dd('error in create.');
+            $this->currentStep = 3;
+            session()->flash('fail', 'Unable to save.');
         }
     }
 
     public function resetAllPublicVariables()
     {
-        # Summary variables
-    	$this->company = null;
-		$this->buyer = null;
-		$this->style = null;
-		$this->item = null;
-		$this->study_date = null;
-
-
         # Line variables
         $this->floor = null;
         $this->line = null;
         $this->allowance = null;
         $this->achieved = null;
-        $this->summary_id = null;
 
 
         # Operation variables
