@@ -27,7 +27,7 @@
     <header class="navbar navbar-expand-md navbar-dark">
       <div class="container-xl">
         
-        <a href="{{ route('home') }}" class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pr-0 pr-md-3">
+        <a href="{{ route('home') }}" class="navbar-brand d-none-navbar-horizontal pr-0 pr-md-3">
           <img src="{{ asset('img/imbalance.jpg') }}" alt="Imbalance" class="navbar-brand-image">
         </a>
 
