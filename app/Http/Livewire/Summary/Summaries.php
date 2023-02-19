@@ -49,6 +49,7 @@ class Summaries extends Component
     	if ($createdSummary) {
             $this->resetAllPublicVariables();
             $this->currentStep = 2;
+            session()->flash('success', 'Data saved successfully.');
             return $this->summary_id = $createdSummary->id;
     	} else {
             $this->currentStep = 1;
@@ -71,6 +72,7 @@ class Summaries extends Component
         if ($createdLine) {
             $this->resetAllPublicVariables();
             $this->currentStep = 3;
+            session()->flash('success', 'Data saved successfully.');
             return $this->line_id = $createdLine->id;
         } else {
             $this->currentStep = 2;
@@ -150,6 +152,7 @@ class Summaries extends Component
 
                 $this->currentStep = 3;
                 $this->dispatchBrowserEvent('refreshJSVariables');
+                session()->flash('success', 'Data saved successfully.');
                 return $this->line_id = $createdOperation->line_id;
             }
         } else {

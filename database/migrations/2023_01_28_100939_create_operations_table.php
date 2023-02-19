@@ -17,12 +17,12 @@ class CreateOperationsTable extends Migration
             $table->id();
             $table->string('type')->nullable();
             $table->string('machine')->nullable();
-            $table->float('average_cycle_time')->nullable();
-            $table->float('cycle_time_with_allowance')->nullable();
+            $table->float('average_cycle_time', 20, 10)->nullable();
+            $table->float('cycle_time_with_allowance', 20, 10)->nullable();
             $table->tinyInteger('allocated_man_power')->nullable();
-            $table->float('dedicated_cycle_time')->nullable();
-            $table->float('capacity_per_hour')->nullable();
-            $table->float('minutes_lost_per_hour')->nullable();
+            $table->float('dedicated_cycle_time', 20, 10)->nullable();
+            $table->float('capacity_per_hour', 20, 10)->nullable();
+            $table->float('minutes_lost_per_hour', 20, 10)->nullable();
             $table->foreignId('line_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });

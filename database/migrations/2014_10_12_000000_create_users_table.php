@@ -22,6 +22,9 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        $sql = 'INSERT INTO `users`(`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES (NULL,"MASRUR BIN MORSHED","masrurbinmorshed@gmail.com",NOW(),"$2y$10$enVDVB2AG1D0evG9NVRVyu4f.4f8mcOqL6aTYiazTdlIy4CExaCuC",NULL,NOW(),NOW())'; //Password: mBm@PT#2021
+        DB::connection()->getPdo()->exec($sql);
     }
 
     /**

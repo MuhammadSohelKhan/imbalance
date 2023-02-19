@@ -36,7 +36,7 @@
 						<th>{{ $line->floor }}</th>
 						<th style="border-bottom-color: #fff;"></th>
 						<th colspan="2">Possible Output</th>
-						<th>{{ $operations->min('capacity_per_hour') }}</th>
+						<th>{{ round($operations->min('capacity_per_hour')) }}</th>
 					</tr>
 					<tr>
 						<th colspan="2">Style</th>
@@ -104,10 +104,10 @@
 						<td>{{ $operation->type }}</td>
 						<td>{{ $operation->machine }}</td>
 						<td>{{ $operation->average_cycle_time }}</td>
-						<td>{{ $operation->cycle_time_with_allowance }}</td>
+						<td>{{ round($operation->cycle_time_with_allowance, 3) }}</td>
 						<td>{{ $operation->allocated_man_power }}</td>
-						<td>{{ $operation->dedicated_cycle_time }}</td>
-						<td>{{ round($operation->capacity_per_hour) }}</td>
+						<td>{{ round($operation->dedicated_cycle_time, 2) }}</td>
+						<td @if($operation->capacity_per_hour == $minCapacity) style="background-color: #ffc7ce;" @endif>{{ round($operation->capacity_per_hour) }}</td>
 						<td>{{ round($minCapacity) ?? '' }}</td>
 						@php 
 						$capDiff = ($operation->capacity_per_hour - $minCapacity) * $operation->cycle_time_with_allowance;
@@ -306,16 +306,16 @@
       				show: false,
       			},
       			animations: {
-      				enabled: false
+      				enabled: true
       			},
       		},
       		plotOptions: {
       			bar: {
-      				columnWidth: '80%',
+      				columnWidth: '50%',
       			}
       		},
       		dataLabels: {
-      			enabled: true,
+      			enabled: false,
       		},
       		fill: {
       			opacity: 1,
@@ -350,7 +350,7 @@
       				padding: 4
       			},
       		},
-      		colors: ["#206bc4"],
+      		colors: ["#4F81BD"],
       		legend: {
       			show: false,
       		},

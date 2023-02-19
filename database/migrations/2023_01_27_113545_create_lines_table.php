@@ -18,7 +18,7 @@ class CreateLinesTable extends Migration
             $table->integer('floor')->nullable();
             $table->integer('line')->nullable();
             $table->integer('allowance')->nullable();
-            $table->integer('possible_output')->nullable();
+            $table->float('possible_output', 20, 10)->nullable();
             $table->integer('achieved')->nullable();
             $table->integer('imbalance')->nullable();
             $table->integer('balance')->nullable();
