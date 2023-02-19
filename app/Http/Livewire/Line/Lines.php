@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Line;
 
 use Livewire\Component;
 
+use App\Models\Summary;
 use App\Models\Line;
 use App\Models\Operation;
 use App\Models\Stage;
@@ -21,10 +22,15 @@ class Lines extends Component
     public function render()
     {
         $this->dispatchBrowserEvent('refreshJSVariables');
+        $summary = Summary::find($this->summary_id);
+
+        if (! $summary) {
+            return abort(404);
+        }
+
     	$lines = Line::where('summary_id', $this->summary_id)->orderBy('id', 'asc')->get();
-    	if ($lines) {
-    		return view('livewire.line.lines', compact('lines'));
-    	}
+
+		return view('livewire.line.lines', compact('summary', 'lines'));
     }
 
     public function resetModalForm()

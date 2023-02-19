@@ -1,10 +1,5 @@
 <div class="box">
   <style type="text/css">
-    .table thead th {
-      color: #354052;
-      background-color: #D8E4BC;
-    }
-
     #operation1, #operation2, #operation3, #operation4, #operation5 {
       position: relative;
     }
@@ -16,14 +11,6 @@
       width: 100%;
       height: 100%;
       z-index: 100;
-    }
-
-    .link-secondary {
-        color: #b0bca2;
-    }
-
-    .link-secondary:hover {
-        color: #addafb;
     }
   </style>
 
@@ -50,10 +37,10 @@
 						{{-- <td>{{ $loop->iteration }}</td> --}}
 						<td>{{ $summary->id }}</td>
 						<td><a href="{{ route('lines', $summary->id)}}" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
-						<td>{{ $summary->buyer }}</td>
-						<td>{{ $summary->style }}</td>
-						<td>{{ $summary->item }}</td>
-						<td>{{ $summary->study_date }}</td>
+						<td class="text-muted">{{ $summary->buyer }}</td>
+						<td class="text-muted">{{ $summary->style }}</td>
+						<td class="text-muted">{{ $summary->item }}</td>
+						<td class="text-muted">{{ $summary->study_date }}</td>
             <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a></td>
 					</tr>
 					@empty
@@ -69,7 +56,7 @@
 
 
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-summary-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-      <div class="modal-dialog modal-lg modal-dialog-centered bg-white" role="document">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">New Line Imbalance Operation</h5>

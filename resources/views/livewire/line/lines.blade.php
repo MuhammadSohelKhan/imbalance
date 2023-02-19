@@ -1,6 +1,11 @@
 <div class="box">
 
   <style type="text/css">
+    .table thead th {
+      color: #354052;
+      background-color: #D8E4BC;
+    }
+
     #operation1, #operation2, #operation3, #operation4, #operation5 {
       position: relative;
     }
@@ -13,6 +18,14 @@
       height: 100%;
       z-index: 100;
     }
+
+    .link-secondary {
+        color: #b0bca2;
+    }
+
+    .link-secondary:hover {
+        color: #addafb;
+    }
   </style>
 
 
@@ -22,8 +35,11 @@
       		<a href="{{ route('home') }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
-			<table class="table table-vcenter card-table table-striped text-nowrap">
+			<table class="table table-vcenter card-table table-striped text-nowrap table-bordered text-center">
 				<thead>
+          <tr>
+            <th colspan="8" style="background-color: #b7dee8; font-size: 1.2rem; font-weight: bolder;">Imbalance Summary <br>{{ $summary->company }}</th>
+          </tr>
 					<tr>
 						<th>SL</th>
 						<th>Floor</th>
@@ -39,12 +55,12 @@
 					@forelse($lines as $line)
 					<tr>
 						<td>{{ $loop->iteration }}</td>
-						<td>{{ $line->floor }}</td>
-						<td class="text-muted">{{ $line->line }}</td>
-						<td class="text-muted">{{ $line->allowance }}</td>
-						<td class="text-muted">{{ round($line->possible_output) }}</td>
-						<td class="text-muted">{{ $line->achieved }}</td>
-						<td class="text-muted">{{ round($line->possible_output - $line->achieved) }}</td>
+						<td>Floor-{{ $line->floor }}</td>
+						<td class="">Line-{{ $line->line }}</td>
+						<td class="">{{ $line->allowance }}</td>
+						<td class="">{{ round($line->possible_output) }}</td>
+						<td class="">{{ $line->achieved }}</td>
+						<td class="">{{ round($line->possible_output - $line->achieved) }}</td>
 						<td><a href="{{ route('operations', $line->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Details</a></td>
 					</tr>
 					@empty
@@ -61,7 +77,7 @@
 
 
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-line-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-lg modal-dialog-centered bg-white" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">New Line Operation</h5>

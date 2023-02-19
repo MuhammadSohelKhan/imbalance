@@ -1,14 +1,6 @@
 <div class="box">
 
   <style type="text/css">
-    .table thead th {
-      color: #354052;
-    }
-
-    .text-inherit {
-      color: inherit !important;
-    }
-
     #operation1, #operation2, #operation3, #operation4, #operation5 {
       position: relative;
     }
@@ -21,14 +13,6 @@
       height: 100%;
       z-index: 100;
     }
-
-    .link-secondary {
-        color: #b0bca2;
-    }
-
-    .link-secondary:hover {
-        color: #addafb;
-    }
   </style>
 	
 	<div class="card">
@@ -37,55 +21,55 @@
       		<a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
-			<table id="operations_table" class="table table-vcenter card-table table-striped table-bordered text-center">
+			<table class="table table-vcenter card-table table-striped table-bordered text-center">
 				<thead>
 					<tr style="background-color: #b7dee8;">
 						<th colspan="9" style="font-size: 1.2rem; font-weight: bolder;">Imbalance check <br>{{ $summary->company }}</th>
 						<th style="font-size: 1.2rem; vertical-align: middle; background-color: #FABF8F; padding-right: .5rem;"><a href="{{ route('lines', $summary->id) }}"><u>Back</u></a></th>
 					</tr>
 					<tr>
-						<th class="text-inherit" colspan="2">Buyer</th>
-						<th class="text-inherit">{{ $summary->buyer }}</th>
+						<th colspan="2">Buyer</th>
+						<th>{{ $summary->buyer }}</th>
 
-						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
-						<th class="text-inherit">Floor</th>
-						<th class="text-inherit">{{ $line->floor }}</th>
-						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
-						<th class="text-inherit" colspan="2">Possible Output</th>
-						<th class="text-inherit">{{ round($operations->min('capacity_per_hour')) }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th>Floor</th>
+						<th>{{ $line->floor }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th colspan="2">Possible Output</th>
+						<th>{{ round($operations->min('capacity_per_hour')) }}</th>
 					</tr>
 					<tr>
-						<th class="text-inherit" colspan="2">Style</th>
-						<th class="text-inherit">{{ $summary->style }}</th>
+						<th colspan="2">Style</th>
+						<th>{{ $summary->style }}</th>
 
-						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
-						<th class="text-inherit">Line</th>
-						<th class="text-inherit">{{ $line->line }}</th>
-						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
-						<th class="text-inherit" colspan="2">Achieved</th>
-						<th class="text-inherit">{{ $line->achieved }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th>Line</th>
+						<th>{{ $line->line }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th colspan="2">Achieved</th>
+						<th>{{ $line->achieved }}</th>
 					</tr>
 					<tr>
-						<th class="text-inherit" colspan="2">Item</th>
-						<th class="text-inherit">{{ $summary->item }}</th>
+						<th colspan="2">Item</th>
+						<th>{{ $summary->item }}</th>
 
-						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
-						<th class="text-inherit">Study Date</th>
-						<th class="text-inherit">{{ $summary->study_date }}</th>
-						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
-						<th class="text-inherit" colspan="2">Imbalance</th>
-						<th class="text-inherit" id="imbalanceCell"></th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th>Study Date</th>
+						<th>{{ $summary->study_date }}</th>
+						<th style="border-bottom-color: #fff;"></th>
+						<th colspan="2">Imbalance</th>
+						<th id="imbalanceCell"></th>
 					</tr>
 					<tr>
-						<th class="text-inherit" colspan="2"></th>
-						<th class="text-inherit"></th>
+						<th colspan="2"></th>
+						<th></th>
 
-						<th class="text-inherit"></th>
-						<th class="text-inherit">Allowance</th>
-						<th class="text-inherit">{{ $line->allowance }}%</th>
-						<th class="text-inherit"></th>
-						<th class="text-inherit" colspan="2">Balance</th>
-						<th class="text-inherit" id="balanceCell"></th>
+						<th></th>
+						<th>Allowance</th>
+						<th>{{ $line->allowance }}%</th>
+						<th></th>
+						<th colspan="2">Balance</th>
+						<th id="balanceCell"></th>
 					</tr>
 				</thead>
 				<thead>
@@ -101,10 +85,10 @@
 						<th style="background-color: #b7dee8;">Possible Output</th>
 						<th style="background-color: #b7dee8;">Minutes Lost Per Hour</th>
 
-						<th class="px-4" style="border-bottom-color: #354052;"></th>
+						<th class="px-4" style="border-bottom-color: #fff;"></th>
 
 						@for($s=1;$s<=$operations->max('stages_count');$s++)
-						<th class="w-1 text-muted" colspan="5">Operation-{{ $s }}</th>
+						<th class="w-1" colspan="5">Operation-{{ $s }}</th>
 						@endfor
 					</tr>
 				</thead>
@@ -123,7 +107,7 @@
 						<td>{{ round($operation->cycle_time_with_allowance, 3) }}</td>
 						<td>{{ $operation->allocated_man_power }}</td>
 						<td>{{ round($operation->dedicated_cycle_time, 2) }}</td>
-						<td @if($operation->capacity_per_hour == $minCapacity) style="background-color: #ffc7ce; color: #354052;" @endif>{{ round($operation->capacity_per_hour) }}</td>
+						<td @if($operation->capacity_per_hour == $minCapacity) style="background-color: #ffc7ce;" @endif>{{ round($operation->capacity_per_hour) }}</td>
 						<td>{{ round($minCapacity) ?? '' }}</td>
 						@php 
 						$capDiff = ($operation->capacity_per_hour - $minCapacity) * $operation->cycle_time_with_allowance;
@@ -131,16 +115,16 @@
 						@endphp
 						<td>{{ round($capDiff) }}</td>
 
-						<td class="px-4" style="border-top-color: #fff; border-bottom-color: #354052;"></td>
+						<td class="px-4" style="border-top-color: #fff; border-bottom-color: #fff;"></td>
 
 						@forelse($operation->stages as $stage)
-						<td class="text-muted">{{ $stage->first }}</td>
-						<td class="text-muted">{{ $stage->second }}</td>
-						<td class="text-muted">{{ $stage->third }}</td>
-						<td class="text-muted">{{ $stage->fourth }}</td>
-						<td class="text-muted">{{ $stage->fifth }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->first }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->second }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->third }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->fourth }}</td>
+						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->fifth }}</td>
 						@empty
-						<td colspan="5"></td>
+						<td colspan="5" style="//background-color: #CCC0DA;"></td>
 						@endforelse
 					</tr>
 					@empty
@@ -151,7 +135,11 @@
 				</tbody>
 				<tfoot style="font-weight: bolder;">
 					<tr>
-						<td colspan="5">Total/Average</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
 						<td>{{ $totalMP }}</td>
 						<td></td>
 						<td>{{ round($operations->avg('capacity_per_hour')) }}</td>
@@ -177,7 +165,7 @@
 
 
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-      <div class="modal-dialog modal-lg modal-dialog-centered bg-white" role="document">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">New Line Operation</h5>
