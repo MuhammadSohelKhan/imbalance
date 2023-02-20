@@ -124,12 +124,12 @@
 						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->fourth }}</td>
 						<td class="text-muted" style="background-color: #CCC0DA;">{{ $stage->fifth }}</td>
 						@empty
-						<td colspan="5" style="//background-color: #CCC0DA;"></td>
+						<td colspan="5"></td>
 						@endforelse
 					</tr>
 					@empty
 					<tr>
-            			<td colspan="10" class="text-center">No data found.</td>
+            <td colspan="10" class="text-center">No data found.</td>
 					</tr>
 					@endforelse
 				</tbody>

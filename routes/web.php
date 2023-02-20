@@ -18,7 +18,7 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
+Route::get('summary-export/{sumid}', [App\Http\Controllers\SummaryController::class, 'index'])->name('summary.export');
 Route::middleware(['auth'])->group(function ()
 {
 	Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
