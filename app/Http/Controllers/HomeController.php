@@ -90,4 +90,36 @@ class HomeController extends Controller
     {
         return view('auth.passwords.change_password');
     }
+
+    public function getAddUserPage()
+    {
+        if (auth()->user()->email == "masrurbinmorshed@gmail.com") {
+            return view('users.create');
+        } else {
+            abort(404);
+        }
+    }
+
+    public function postAddUser(Request $request)
+    {
+        if (auth()->user()->email == "masrurbinmorshed@gmail.com") {
+            $data = $request->validate([
+                'name' => 'required|string',
+                'email' => 'required|string|email|unique:users',
+                'password' => 'required|string|min:8|max:30|confirmed',
+            ]);
+            $data['password'] = Hash::make($data['password']);
+
+            $newUser = \App\Models\User::create(array_merge($data, [
+                'email_verified_at' => now(),
+            ]));
+
+            if ($newUser) {
+                session()->flash('success', 'User added successfully.');
+            }
+            return back();
+        } else {
+            abort(404);
+        }
+    }
 }

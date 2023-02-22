@@ -14,8 +14,8 @@ class AddTriggersToStagesTable extends Migration
     public function up()
     {
         $sql = '
-        DROP TRIGGER IF EXISTS `calculate_average_cycle_time2`;
-        CREATE TRIGGER `calculate_average_cycle_time2` 
+        DROP TRIGGER IF EXISTS `calculate_average_cycle_time`;
+        CREATE TRIGGER `calculate_average_cycle_time` 
         AFTER INSERT ON `stages` 
         FOR EACH ROW 
         BEGIN 
@@ -33,8 +33,8 @@ class AddTriggersToStagesTable extends Migration
             UPDATE `lines` SET `possible_output` = (SELECT MIN(capacity_per_hour) FROM `operations` WHERE `line_id` = @thisLineID) WHERE `id` = @thisLineID;
         END;
 
-        DROP TRIGGER IF EXISTS `update_average_cycle_time2`;
-        CREATE TRIGGER `update_average_cycle_time2` 
+        DROP TRIGGER IF EXISTS `update_average_cycle_time`;
+        CREATE TRIGGER `update_average_cycle_time` 
         AFTER UPDATE ON `stages` 
         FOR EACH ROW 
         BEGIN 
@@ -63,7 +63,7 @@ class AddTriggersToStagesTable extends Migration
      */
     public function down()
     {
-        $sql = "DROP TRIGGER IF EXISTS calculate_average_cycle_time2; DROP TRIGGER IF EXISTS update_average_cycle_time2;";
+        $sql = "DROP TRIGGER IF EXISTS calculate_average_cycle_time; DROP TRIGGER IF EXISTS update_average_cycle_time;";
         DB::connection()->getPdo()->exec($sql);
     }
 }

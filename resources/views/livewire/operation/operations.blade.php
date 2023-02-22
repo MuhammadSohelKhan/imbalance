@@ -91,7 +91,7 @@
 				<thead>
 					<tr>
 						<th style="background-color: #b7dee8;">SL</th>
-						<th style="background-color: #b7dee8;">Type</th>
+						<th style="background-color: #b7dee8;">Operation</th>
 						<th style="background-color: #b7dee8;">Machine</th>
 						<th style="background-color: #b7dee8;">Avg Cycle Time</th>
 						<th style="background-color: #b7dee8;">Cycle Time With Allowance</th>

@@ -33,5 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function ()
 
 	Route::get('change-password', [App\Http\Controllers\HomeController::class, 'getChangePasswordPage'])->name('password.get');
 	Route::patch('change-password', [App\Http\Controllers\HomeController::class, 'postChangePassword'])->name('password.post');
-});
 
+	Route::get('add-user', [App\Http\Controllers\HomeController::class, 'getAddUserPage'])->name('user.get');
+	Route::post('add-user', [App\Http\Controllers\HomeController::class, 'postAddUser'])->name('user.post');
+});
