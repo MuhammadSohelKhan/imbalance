@@ -14,12 +14,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-Auth::routes();
+Auth::routes([
+	'register'	=> FALSE,
+	'reset'		=> FALSE,
+	'verify'	=> FALSE,
+]);
 
-Route::middleware(['auth'])->group(function ()
+Route::middleware(['auth', 'verified'])->group(function ()
 {
 	Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 	Route::get('/summary/{summary}/lines', [App\Http\Controllers\HomeController::class, 'line'])->name('lines');
