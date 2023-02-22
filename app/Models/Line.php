@@ -10,4 +10,14 @@ class Line extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function summary()
+    {
+    	return $this->belongsTo(Summary::class);
+    }
+
+    public function operations()
+    {
+    	return $this->hasMany(Operation::class);
+    }
 }

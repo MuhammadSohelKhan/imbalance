@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
+use App\Models\Summary;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SummaryExport;
+
 class HomeController extends Controller
 {
     /**
@@ -34,7 +38,7 @@ class HomeController extends Controller
      */
     public function line($summary_id)
     {
-        $ctrlSummary = \App\Models\Summary::findOrFail($summary_id);
+        $ctrlSummary = Summary::findOrFail($summary_id);
 
         return view('line', compact('ctrlSummary'));
     }
@@ -47,6 +51,12 @@ class HomeController extends Controller
     public function operation($line_id)
     {
         return view('operation', compact('line_id'));
+    }
+
+    public function exportSummary($sumid)
+    {
+        $summary = Summary::findOrFail($sumid);
+        return Excel::download(new SummaryExport($summary->id), 'imbalance-analysis.xlsx');
     }
 
     public function postChangePassword(Request $request)
