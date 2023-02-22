@@ -6,9 +6,6 @@ use App\Models\Summary;
 use App\Http\Requests\StoreSummaryRequest;
 use App\Http\Requests\UpdateSummaryRequest;
 
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\SummaryExport;
-
 class SummaryController extends Controller
 {
     /**
@@ -16,9 +13,9 @@ class SummaryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($sumid)
+    public function index()
     {
-        return Excel::download(new SummaryExport($sumid), 'imbalance-analysis.xlsx');
+        //
     }
 
     /**

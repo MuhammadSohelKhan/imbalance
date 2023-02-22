@@ -28,7 +28,7 @@
 						<th>Style</th>
 						<th>Item</th>
 						<th class="w-1">Study Date</th>
-            <th class="w-1">Action</th>
+            <th class="w-1">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -41,7 +41,7 @@
 						<td class="text-muted">{{ $summary->style }}</td>
 						<td class="text-muted">{{ $summary->item }}</td>
 						<td class="text-muted">{{ $summary->study_date }}</td>
-            <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a></td>
+            <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a> <a href="{{ route('summary.export', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">Download</a></td>
 					</tr>
 					@empty
 					<tr>

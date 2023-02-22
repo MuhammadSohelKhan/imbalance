@@ -18,12 +18,14 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::get('summary-export/{sumid}', [App\Http\Controllers\SummaryController::class, 'index'])->name('summary.export');
+
 Route::middleware(['auth'])->group(function ()
 {
 	Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 	Route::get('/summary/{summary}/lines', [App\Http\Controllers\HomeController::class, 'line'])->name('lines');
 	Route::get('/line/{line}/operations', [App\Http\Controllers\HomeController::class, 'operation'])->name('operations');
+
+	Route::get('summary-export/{sumid}', [App\Http\Controllers\HomeController::class, 'exportSummary'])->name('summary.export');
 
 	Route::get('change-password', [App\Http\Controllers\HomeController::class, 'getChangePasswordPage'])->name('password.get');
 	Route::patch('change-password', [App\Http\Controllers\HomeController::class, 'postChangePassword'])->name('password.post');
