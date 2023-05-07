@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Line;
+use App\Models\Operation;
+use App\Models\Stage;
 use App\Http\Requests\StoreLineRequest;
 use App\Http\Requests\UpdateLineRequest;
+use Illuminate\Http\Request;
 
 class LineController extends Controller
 {
@@ -16,6 +19,68 @@ class LineController extends Controller
     public function index()
     {
         //
+    }
+
+    public function archiveLine($line_id)
+    {
+        $aUser = auth()->user();
+        $copiedLine = Line::with(['operations' => function ($q)
+        {
+            $q->with('stages')->withCount('stages');
+        }])->withCount('operations')->findOrFail($line_id);
+
+        $newLine = Line::create([
+            'buyer' => $copiedLine->buyer,
+            'style' => $copiedLine->style,
+            'item' => $copiedLine->item,
+            'study_date' => $copiedLine->study_date,
+            'floor' => $copiedLine->floor,
+            'line' => $copiedLine->line,
+            'allowance' => $copiedLine->allowance,
+            'achieved' => $copiedLine->achieved,
+            'is_archived' => FALSE,
+            'project_id' => $copiedLine->project_id,
+            'copied_from' => $copiedLine->id,
+        ]);
+
+        if ($newLine && $copiedLine->operations_count) {
+            foreach ($copiedLine->operations as $ind => $copiedOpr) {
+                $newOpr = \App\Models\Operation::create([
+                    'type' => $copiedOpr->type,
+                    'machine' => $copiedOpr->machine,
+                    'allocated_man_power' => $copiedOpr->allocated_man_power,
+                    'line_id' => $newLine->id,
+                ]);
+
+                /*if ($newOpr && $copiedOpr->stages_count) {
+                    foreach ($copiedOpr->stages as $copiedStg) {
+                        \App\Models\Stage::create([
+                            'first' => $copiedStg->first,
+                            'second' => $copiedStg->second,
+                            'third' => $copiedStg->third,
+                            'fourth' => $copiedStg->fourth,
+                            'fifth' => $copiedStg->fifth,
+                            'operation_id' => $newOpr->id,
+                        ]);
+                    }
+                }*/
+            }
+        }
+
+        // Archiving the copied line
+        if (! $copiedLine->is_archived) {
+            $copiedLine->update([
+                'is_archived' => 1,
+                'archived_date' => date('Y-m-d')
+            ]);
+        }
+
+        return redirect(route('edit_line', $newLine->id));
+    }
+
+    public function copiedLine($line_id)
+    {
+        return view('lines.archive_line', compact('line_id'));
     }
 
     /**

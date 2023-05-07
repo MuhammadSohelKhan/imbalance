@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Summary;
+use App\Models\Project;
 
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -13,9 +13,9 @@ class SummaryExport implements WithMultipleSheets
 
     protected $summary;
 
-    public function __construct($summary_id)
+    public function __construct($projid)
     {
-    	$this->summary = $summary_id;
+    	$this->summary = $projid;
     }
 
     /**
@@ -24,18 +24,18 @@ class SummaryExport implements WithMultipleSheets
     public function sheets(): array
     {
     	$sheets = [];
-    	$summaryLines = Summary::where('id', $this->summary)->with(['lines' => function ($ql)
+    	$projectLines = Project::where('id', $this->summary)->with(['client:id,name', 'lines' => function ($ql)
     	{
-    		$ql->with(['operations'=>function ($qo)
+    		$ql->where('is_archived', 0)->with(['operations'=>function ($qo)
     		{
     			$qo->with('stages')->withCount('stages');
     		}]);
     	}])->first();
 
-    	$sheets[] = new SummarySheet($summaryLines);
+    	$sheets[] = new SummarySheet($projectLines);
 
-    	foreach ($summaryLines->lines as $index => $line) {
-    		$sheets[] = new SummaryPerLineSheet($summaryLines, $line);
+    	foreach ($projectLines->lines as $index => $line) {
+    		$sheets[] = new SummaryPerLineSheet($projectLines, $line);
     	}
 
         return $sheets;

@@ -11,6 +11,7 @@
 		</div>
 	</div>
 
+  @if($ctrlProject->is_active && in_array($aUser->role, ['Master','superadmin','admin']))
 	<div class="row row-deck row-cards">
 		<div class="col-sm-6 col-xl-4">
 			<div class="card card-sm">
@@ -29,8 +30,9 @@
 			</div>
 		</div>
 	</div>
+  @endif
 
-	<livewire:line.lines :summary_id="$ctrlSummary->id">
+	<livewire:line.lines :aUser="$aUser" :project_id="$ctrlProject->id">
 
 @endsection
 

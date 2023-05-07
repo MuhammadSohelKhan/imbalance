@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Summary;
-use App\Http\Requests\StoreSummaryRequest;
-use App\Http\Requests\UpdateSummaryRequest;
+use App\Models\Project;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 
-class SummaryController extends Controller
+class ProjectController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,10 +31,10 @@ class SummaryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreSummaryRequest  $request
+     * @param  \App\Http\Requests\StoreProjectRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreSummaryRequest $request)
+    public function store(StoreProjectRequest $request)
     {
         //
     }
@@ -42,10 +42,10 @@ class SummaryController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Summary  $summary
+     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function show(Summary $summary)
+    public function show(Project $project)
     {
         //
     }
@@ -53,10 +53,10 @@ class SummaryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Summary  $summary
+     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function edit(Summary $summary)
+    public function edit(Project $project)
     {
         //
     }
@@ -64,11 +64,11 @@ class SummaryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateSummaryRequest  $request
-     * @param  \App\Models\Summary  $summary
+     * @param  \App\Http\Requests\UpdateProjectRequest  $request
+     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateSummaryRequest $request, Summary $summary)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
         //
     }
@@ -76,10 +76,10 @@ class SummaryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Summary  $summary
+     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Summary $summary)
+    public function destroy(Project $project)
     {
         //
     }

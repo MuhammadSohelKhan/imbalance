@@ -34,18 +34,18 @@
 	<div class="card">
 		<div class="card-header justify-content-between">
 			<h4 class="card-title">Analysis of Line-{{ $line->line }}</h4>
-      		<a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-secondary">Back</a>
+      		<a href="{{ route('lines', $line->project_id) }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
 			<table id="operations_table" class="table table-vcenter card-table table-striped table-bordered text-center">
 				<thead>
 					<tr style="background-color: #b7dee8;">
-						<th colspan="9" style="font-size: 1.2rem; font-weight: bolder;">Imbalance check <br>{{ $summary->company }}</th>
-						<th style="font-size: 1.2rem; vertical-align: middle; background-color: #FABF8F; padding-right: .5rem;"><a href="{{ route('lines', $summary->id) }}"><u>Back</u></a></th>
+						<th colspan="9" style="font-size: 1.2rem; font-weight: bolder;">Imbalance check <br>{{ $line->project->client->name }}</th>
+						<th style="font-size: 1.2rem; vertical-align: middle; background-color: #FABF8F; padding-right: .5rem;"><a href="{{ route('lines', $line->project_id) }}"><u>Back</u></a></th>
 					</tr>
 					<tr>
 						<th class="text-inherit" colspan="2">Buyer</th>
-						<th class="text-inherit">{{ $summary->buyer }}</th>
+						<th class="text-inherit">{{ $line->buyer }}</th>
 
 						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
 						<th class="text-inherit">Floor</th>
@@ -56,7 +56,7 @@
 					</tr>
 					<tr>
 						<th class="text-inherit" colspan="2">Style</th>
-						<th class="text-inherit">{{ $summary->style }}</th>
+						<th class="text-inherit">{{ $line->style }}</th>
 
 						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
 						<th class="text-inherit">Line</th>
@@ -67,11 +67,11 @@
 					</tr>
 					<tr>
 						<th class="text-inherit" colspan="2">Item</th>
-						<th class="text-inherit">{{ $summary->item }}</th>
+						<th class="text-inherit">{{ $line->item }}</th>
 
 						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
 						<th class="text-inherit">Study Date</th>
-						<th class="text-inherit">{{ $summary->study_date }}</th>
+						<th class="text-inherit">{{ $line->study_date }}</th>
 						<th class="text-inherit" style="border-bottom-color: #354052;"></th>
 						<th class="text-inherit" colspan="2">Imbalance</th>
 						<th class="text-inherit" id="imbalanceCell"></th>
@@ -181,7 +181,7 @@
         <div class="modal-content border-white">
           <div class="modal-header">
             <h5 class="modal-title">New Line Operation</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm()">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>

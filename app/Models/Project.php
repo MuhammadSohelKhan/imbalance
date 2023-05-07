@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+//use App\Models\Line;
 
-class Line extends Model
+class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -41,13 +43,21 @@ class Line extends Model
         });
     }
 
-    public function project()
+    public function client()
     {
-    	return $this->belongsTo(Project::class);
+        return $this->belongsTo(Client::class);
     }
 
+    public function lines()
+    {
+    	return $this->hasMany(Line::class);
+    }
+
+    /**
+     * Get all of the operations for the summary.
+     */
     public function operations()
     {
-    	return $this->hasMany(Operation::class);
+        return $this->hasManyThrough(Operation::class, Line::class);
     }
 }

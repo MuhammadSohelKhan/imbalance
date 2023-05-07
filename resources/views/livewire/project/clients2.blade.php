@@ -1,11 +1,5 @@
 <div class="box">
-
   <style type="text/css">
-    .table thead th {
-      color: #354052;
-      background-color: #D8E4BC;
-    }
-
     #operation1, #operation2, #operation3, #operation4, #operation5 {
       position: relative;
     }
@@ -18,78 +12,40 @@
       height: 100%;
       z-index: 100;
     }
-
-    .link-secondary {
-        color: #b0bca2;
-    }
-
-    .link-secondary:hover {
-        color: #addafb;
-    }
   </style>
 
-
 	<div class="card">
-		<div class="card-header justify-content-between">
-			<h4 class="card-title">{{ $lineStatus[0] }} Lines</h4>
-      <div>
-        @if(in_array($aUser->role, ['Master','superadmin','admin']))
-        @if($lineStatus[1] == 0)
-        <button wire:click="toggleLineStatus()" class="btn btn-sm btn-primary" title="See the archived lines">Archived Lines</button>
-        @else
-        <button wire:click="toggleLineStatus()" class="btn btn-sm btn-primary" title="See the active lines">Active Lines</button>
-        @endif
-        @endif
-        <a href="{{ route('projects', $project->client_id) }}" class="btn btn-sm btn-secondary">Back</a>
-      </div>
+		<div class="card-header">
+			<h4 class="card-title">Analytics of Summaries will be added here</h4>
 		</div>
 		<div class="table-responsive">
-			<table class="table table-vcenter card-table table-striped text-nowrap table-bordered text-center">
+			<table class="table table-vcenter card-table table-striped text-nowrap">
 				<thead>
-          <tr>
-            <th colspan="12" style="background-color: #b7dee8; font-size: 1.2rem; font-weight: bolder;">Imbalance Summary <br>{{ $project->client->name }}</th>
-          </tr>
 					<tr>
 						<th>SL</th>
-            <th>Buyer</th>
-            <th>Style</th>
-            <th>Item</th>
-            <th>Study Date</th>
-						<th>Floor</th>
-						<th>Line</th>
-						<th>Allowance</th>
-						<th>Possible Output</th>
-						<th>Actual Production</th>
-						<th>Improve Scope/hr</th>
-						<th class="w-1">Action</th>
+						<th>Company</th>
+						<th>Buyer</th>
+						<th>Style</th>
+						<th>Item</th>
+						<th class="w-1">Study Date</th>
+            <th class="w-1">Action</th>
 					</tr>
 				</thead>
 				<tbody>
-					@forelse($lines as $line)
+					@forelse($summaries as $summary)
 					<tr>
-						<td>{{ $loop->iteration }}</td>
-            <td>{{ $line->buyer }}</td>
-            <td>{{ $line->style }}</td>
-            <td>{{ $line->item }}</td>
-            <td>{{ $line->study_date }}</td>
-						<td>Fl-{{ $line->floor }}</td>
-						<td>Ln-{{ $line->line }}</td>
-						<td>{{ $line->allowance }}</td>
-						<td>{{ round($line->possible_output) }}</td>
-						<td>{{ $line->achieved }}</td>
-						<td>{{ round($line->possible_output - $line->achieved) }}</td>
-						<td><a href="{{ route('operations', $line->id) }}" class="btn btn-sm btn-info" tabindex="-1" title="See details of this line">View Details</a>
-              @if(! $line->is_archived)
-              <a href="{{ route('edit_line', $line->id) }}" class="btn btn-sm btn-warning" tabindex="-1" title="Edit This Line">Edit</a>
-              <a href="{{ route('archive_line', $line->id) }}" class="btn btn-sm btn-warning" tabindex="-1" title="Copy & Archive This Line">Copy</a>
-              @else
-              <a href="{{ route('archive_line', $line->id) }}" class="btn btn-sm btn-warning" tabindex="-1" title="Copy This Line">Copy</a>
-              @endif
-            </td>
+						{{-- <td>{{ $loop->iteration }}</td> --}}
+						<td>{{ $summary->id }}</td>
+						<td><a href="{{ route('lines', $summary->id)}}" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
+						<td class="text-muted">{{ $summary->buyer }}</td>
+						<td class="text-muted">{{ $summary->style }}</td>
+						<td class="text-muted">{{ $summary->item }}</td>
+						<td class="text-muted">{{ $summary->study_date }}</td>
+            <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a></td>
 					</tr>
 					@empty
 					<tr>
-            <td colspan="12" class="text-center">No data found.</td>
+            <td colspan="6" class="text-center">No data found.</td>
 					</tr>
 					@endforelse
 				</tbody>
@@ -99,39 +55,45 @@
 
 
 
-
-	<div class="modal modal-blur fade" wire:ignore.self id="modal-line-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+	<div class="modal modal-blur fade" wire:ignore.self id="modal-summary-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content border-white">
+        <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">New Line Operation</h5>
+            <h5 class="modal-title">New Line Imbalance Operation</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>
           @if (session()->has('success'))
-		    <div class="alert alert-success alert-dismissible" role="alert">
-		        <ul>
-		            <li>{{ session()->get('success') }}</li>
-		        </ul>
-		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
-		    </div>
-		  @endif
-		  @if (session()->has('fail'))
-		    <div class="alert alert-danger alert-dismissible" role="alert">
-		        <ul>
-		            <li>{{ session()->get('fail') }}</li>
-		        </ul>
-		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
-		    </div>
-		  @endif
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <ul>
+                <li>{{ session()->get('success') }}</li>
+            </ul>
+            <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+        </div>
+      @endif
+      @if (session()->has('fail'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul>
+                <li>{{ session()->get('fail') }}</li>
+            </ul>
+            <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+        </div>
+      @endif
 
 
-        {{-- START LINE FORM --}}
-          @if($currentStep == 2)
-          <form id="project-form" wire:submit.prevent="saveLine">
+        {{-- START SUMMARY FORM --}}
+          @if($currentStep == 1)
+          <form id="summary-form" wire:submit.prevent="saveSummary">
           <div class="modal-body">
             <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label class="form-label">Company</label>
+                  <input type="text" class="form-control" id="company" name="company" wire:model.lazy="company" placeholder="Write company name">
+                  <span class="text-danger">@error('company') {{ $message }} @enderror</span>
+                </div>
+              </div>
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Buyer</label>
@@ -139,15 +101,15 @@
                   <span class="text-danger">@error('buyer') {{ $message }} @enderror</span>
                 </div>
               </div>
+            </div>
+            <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Style</label>
-                  <input type="text" class="form-control" id="style" name="style" wire:model.lazy="style" placeholder="Write style of the product">
+                  <input type="text" class="form-control" id="style" name="style" wire:model.lazy="style" placeholder="Write style name">
                   <span class="text-danger">@error('style') {{ $message }} @enderror</span>
                 </div>
               </div>
-            </div>
-            <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Item</label>
@@ -155,6 +117,8 @@
                   <span class="text-danger">@error('item') {{ $message }} @enderror</span>
                 </div>
               </div>
+            </div>
+            <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Study Date</label>
@@ -163,6 +127,25 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div class="modal-footer">
+            <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary ml-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Next
+            </button>
+          </div>
+          </form>
+          @endif
+        {{-- END SUMMARY FORM --}}
+
+
+        {{-- START LINE FORM --}}
+          @if($currentStep == 2)
+          <form id="summary-form" wire:submit.prevent="saveLine">
+          <div class="modal-body">
             <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
@@ -198,9 +181,9 @@
             <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
-                  <label class="form-label">Project ID</label>
-                  <input type="number" class="form-control" id="project_id" name="project_id" wire:model.lazy="project_id" disabled="true">
-                  <span class="text-danger">@error('project_id') {{ $message }} @enderror</span>
+                  <label class="form-label">Summary ID</label>
+                  <input type="number" class="form-control" id="summary_id" name="summary_id" wire:model.lazy="summary_id" disabled="true">
+                  <span class="text-danger">@error('summary_id') {{ $message }} @enderror</span>
                 </div>
               </div>
             </div>
@@ -221,7 +204,7 @@
 
         {{-- START OPERATION FORM --}}
           @if($currentStep == 3)
-          <form id="project-form" wire:submit.prevent="saveOperation(Object.fromEntries(new FormData($event.target)))">
+          <form id="summary-form" wire:submit.prevent="saveOperation(Object.fromEntries(new FormData($event.target)))">
           <div class="modal-body">
             <div class="row">
               <div class="col-lg-6">

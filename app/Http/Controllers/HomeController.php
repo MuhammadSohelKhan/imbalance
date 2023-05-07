@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
-use App\Models\Summary;
+use App\Models\Client;
+use App\Models\Project;
+use App\Models\Line;
+use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SummaryExport;
 
@@ -28,7 +31,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $aUser = auth()->user();
+        return view('home', compact('aUser'));
     }
 
     /**
@@ -36,11 +40,25 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function line($summary_id)
+    public function projects($client_id)
     {
-        $ctrlSummary = Summary::findOrFail($summary_id);
+        $aUser = auth()->user();
+        $ctrlClient = Client::findOrFail($client_id);
 
-        return view('line', compact('ctrlSummary'));
+        return view('project', compact('ctrlClient', 'aUser'));
+    }
+
+    /**
+     * Show the application dashboard (lines of a summary).
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function lines($project_id)
+    {
+        $aUser = auth()->user();
+        $ctrlProject = Project::findOrFail($project_id);
+
+        return view('line', compact('ctrlProject', 'aUser'));
     }
 
     /**
@@ -50,13 +68,14 @@ class HomeController extends Controller
      */
     public function operation($line_id)
     {
-        return view('operation', compact('line_id'));
+        $ctrlLine = Line::findOrFail($line_id);
+        return view('operation', compact('ctrlLine'));
     }
 
-    public function exportSummary($sumid)
+    public function exportSummary($projid)
     {
-        $summary = Summary::findOrFail($sumid);
-        return Excel::download(new SummaryExport($summary->id), 'imbalance-analysis.xlsx');
+        $project = Project::findOrFail($projid);
+        return Excel::download(new SummaryExport($project->id), 'imbalance-analysis.xlsx');
     }
 
     public function postChangePassword(Request $request)
@@ -91,33 +110,93 @@ class HomeController extends Controller
         return view('auth.passwords.change_password');
     }
 
-    public function getAddUserPage()
+    public function getUserPage(Request $request)
     {
-        if (auth()->user()->email == "masrurbinmorshed@gmail.com") {
-            return view('users.create');
+        $aUser = auth()->user();
+        if (in_array($aUser->role, ['Master','superadmin'])) {
+            $user = "";
+            if ($request->u) {
+                $request->validate(['u'=>'exists:users,email']);
+                $user = User::where('email', $request->u)->select('id','name','email','role')->first();
+
+                if ($user->email == "masrurbinmorshed@gmail.com" && $aUser->role != "Master") {
+                    abort(404);
+                }
+                session()->flash('hdn_edit_user',TRUE);
+                session()->flash('hdn_edit_user_id', $user->id);
+                session()->flash('hdn_edit_user_email',$user->email);
+            }
+            return view('users.create', compact('aUser', 'user'));
         } else {
             abort(404);
         }
     }
 
-    public function postAddUser(Request $request)
+    public function getAllUserPage(Request $request)
     {
-        if (auth()->user()->email == "masrurbinmorshed@gmail.com") {
+        $aUser = auth()->user();
+        if (in_array($aUser->role, ['Master','superadmin'])) {
+            $users = User::select('id','name','email','role');
+
+            if (in_array($aUser->role, ['superadmin'])) {
+                $users = $users->where('role','!=','Master');
+            }
+            $users = $users->get();
+
+            return view('users.all_users', compact('users'));
+        } else {
+            abort(403);
+        }
+    }
+
+    public function postUser(Request $request)
+    {
+        $aUser = auth()->user();
+        if (in_array($aUser->role, ['Master','superadmin'])) {
             $data = $request->validate([
                 'name' => 'required|string',
-                'email' => 'required|string|email|unique:users',
-                'password' => 'required|string|min:8|max:30|confirmed',
+                'email' => 'required|string|email|unique:users,email,'.session()->get('hdn_edit_user_id'),
+                'role' => 'required|string|in:superadmin,admin,user',
             ]);
-            $data['password'] = Hash::make($data['password']);
 
-            $newUser = \App\Models\User::create(array_merge($data, [
-                'email_verified_at' => now(),
-            ]));
+            if ($data['email'] == "masrurbinmorshed@gmail.com" && $aUser->role != "Master") {
+                abort(404);
+            }
+
+            if (!session()->has('hdn_edit_user')) {
+                $password = $request->validate([
+                    'password' => 'required|string|min:8|max:30|confirmed',
+                ]);
+                $data['password'] = Hash::make($password['password']);
+
+                $newUser = User::create(array_merge($data, [
+                    'email_verified_at' => now(),
+                ]));
+            } else {
+                $newUser = User::where('id', session()->get('hdn_edit_user_id'))->where('email', session()->get('hdn_edit_user_email'))->first()->update($data);
+            }
 
             if ($newUser) {
-                session()->flash('success', 'User added successfully.');
+                session()->flash('success', 'User data stored successfully.');
             }
-            return back();
+            return redirect(route('users.all'));
+        } else {
+            abort(403);
+        }
+    }
+
+    public function deleteUser(User $user)
+    {
+        $aUser = auth()->user();
+        if (in_array($aUser->role, ['Master','superadmin'])) {
+
+            if ($user->email == "masrurbinmorshed@gmail.com" && $aUser->role != "Master") {
+                abort(404);
+            }
+            
+            $user->delete();
+            session()->flash('success', 'User deleted successfully.');
+            return redirect(route('users.all'));
         } else {
             abort(404);
         }

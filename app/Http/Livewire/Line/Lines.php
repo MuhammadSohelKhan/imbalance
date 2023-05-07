@@ -4,17 +4,17 @@ namespace App\Http\Livewire\Line;
 
 use Livewire\Component;
 
-use App\Models\Summary;
+use App\Models\Project;
 use App\Models\Line;
 use App\Models\Operation;
 use App\Models\Stage;
 
 class Lines extends Component
 {
-    public $currentStep = 2;
-    public $totalStep = 3;
-    public $keep_data = 1;
-	public $summary_id,
+    public $aUser;
+    public $currentStep = 2, $totalStep = 3;
+    public $keep_data = 1, $lineStatus = ["Active", 0];
+	public $project_id, $buyer, $style, $item, $study_date,
 		$floor, $line, $allowance, $achieved,
         $type, $machine, $allocated_man_power, $line_id,
         $step1, $step2, $step3, $step4, $step5, $operation_id;
@@ -22,15 +22,25 @@ class Lines extends Component
     public function render()
     {
         $this->dispatchBrowserEvent('refreshJSVariables');
-        $summary = Summary::find($this->summary_id);
+        $project = Project::find($this->project_id);
 
-        if (! $summary) {
+        if (! $project) {
             return abort(404);
         }
 
-    	$lines = Line::where('summary_id', $this->summary_id)->orderBy('id', 'asc')->get();
+        $lines = Line::where('project_id', $this->project_id)->where('is_archived', $this->lineStatus[1]);
 
-		return view('livewire.line.lines', compact('summary', 'lines'));
+        if ($this->aUser->role == 'user') {
+            $lines = $lines->where('created_by', $this->aUser->id);
+        }
+    	$lines = $lines->orderBy('id', 'asc')->get();
+
+		return view('livewire.line.lines', compact('project', 'lines'));
+    }
+
+    public function toggleLineStatus()
+    {
+        $this->lineStatus = ($this->lineStatus[1] == 0) ? ["Archived", 1] : ["Active", 0];
     }
 
     public function resetModalForm()
@@ -44,11 +54,15 @@ class Lines extends Component
     public function saveLine()
     {
         $lineData = $this->validate([
+            'buyer' => 'required|string',
+            'style' => 'required|string',
+            'item' => 'required|string',
+            'study_date' => 'required|date',
             'floor' => 'required|integer|min:1',
             'line' => 'required|integer|min:1',
             'allowance' => 'required|integer|min:1',
             'achieved' => 'required|integer|min:1',
-            'summary_id' => 'required|exists:summaries,id',
+            'project_id' => 'required|exists:projects,id',
         ]);
 
         $createdLine = Line::create($lineData);
@@ -148,6 +162,10 @@ class Lines extends Component
     public function resetAllPublicVariables()
     {
         # Line variables
+        $this->buyer = null;
+        $this->style = null;
+        $this->item = null;
+        $this->study_date = null;
         $this->floor = null;
         $this->line = null;
         $this->allowance = null;

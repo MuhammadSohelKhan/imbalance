@@ -3,7 +3,7 @@
     <thead>
     <tr>
         <td width="3"></td>
-        <th colspan="8" height="45" bgcolor="#B7DEE8" style="border: 1px solid #000; font-family: 'Times New Roman';">Imbalance Summary<br>{{ $summary->company }}
+        <th colspan="8" height="45" bgcolor="#B7DEE8" style="border: 1px solid #000; font-family: 'Times New Roman';">Imbalance Summary<br>{{ $summary->client->name }}
         </th>
     </tr>
     <tr>
@@ -23,10 +23,10 @@
         <tr>
             <td width="3"></td>
             <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;"><a href="sheet://'Line-{{ $line->line }}'!A1">Line-{{ $line->line }}</a></td>
-            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $summary->buyer }}</td>
-            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $summary->style }}</td>
-            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $summary->item }}</td>
-            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $summary->study_date }}</td>
+            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $line->buyer }}</td>
+            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $line->style }}</td>
+            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $line->item }}</td>
+            <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $line->study_date }}</td>
             <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ round($line->possible_output) }}</td>
             <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ $line->achieved }}</td>
             <td valign="middle" bgcolor="#DAEEF3" style="border: 1px solid #000; font-family: 'Times New Roman'; text-align: center;">{{ round($line->possible_output - $line->achieved) }}</td>

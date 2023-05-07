@@ -4,41 +4,54 @@ namespace App\Http\Livewire\Operation;
 
 use Livewire\Component;
 
-use App\Models\Summary;
+use App\Models\Project;
 use App\Models\Line;
 use App\Models\Operation;
 use App\Models\Stage;
 
 class Operations extends Component
 {
-    public $currentStep = 3;
-    public $totalStep = 3;
+    public $aUser, $line, $operations, $reload = FALSE;
+    public $currentStep = 3, $totalStep = 3;
     public $keep_data = 1;
 	public $line_id,
         $type, $machine, $allocated_man_power,
         $step1, $step2, $step3, $step4, $step5, $operation_id;
 
+    public function mount()
+    {
+        $this->aUser = auth()->user();
+
+        $this->loadLineData();
+        $this->loadOprsData();
+    }
+
     public function render()
     {
         $this->dispatchBrowserEvent('refreshJSVariables');
-    	$line = Line::find($this->line_id);
+    	/*$line = Line::with(['project' => function ($q)
+        {
+            $q->select('id','client_id')->with('client:id,name');
+        }])->findOrFail($this->line_id);
 
     	if (! $line) {
     		return abort(404);
     	}
 
-    	$summary = Summary::findOrFail($line->summary_id);
-    	$operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();
+    	$operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();*/
 
-
-        return view('livewire.operation.operations', compact('line', 'summary', 'operations'));
+        return view('livewire.operation.operations'/*, compact('line', 'operations')*/);
     }
 
     public function resetModalForm()
     {
+        if ($this->reload) {
+            return redirect(route('operations', $this->line_id));
+        }
         $this->resetErrorBag();
         $this->resetAllPublicVariables();
         $this->currentStep = 3;
+        $this->loadOprsData();
         $this->dispatchBrowserEvent('DOMContentLoaded');
         $this->dispatchBrowserEvent('resetModalForm');
     }
@@ -114,14 +127,36 @@ class Operations extends Component
                 }
 
                 $this->currentStep = 3;
+                $this->reload = TRUE;
                 $this->dispatchBrowserEvent('refreshJSVariables');
                 session()->flash('success', 'Data saved successfully.');
-                return $this->line_id = $createdOperation->line_id;
             }
         } else {
             $this->currentStep = 3;
             session()->flash('fail', 'Unable to save.');
         }
+    }
+
+    public function loadLineData()
+    {
+        $this->line = Line::where('id',$this->line_id)->with(['project' => function ($q)
+            {
+                $q->select('id','client_id')->with('client:id,name');
+            }]);
+        if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
+            $this->line = $this->line->first();
+        } else {
+            $this->line = $this->line->where('is_archived', 0)->where('created_by', $this->aUser->id)->first();
+        }
+
+        if (! $this->line) {
+            return abort(404);
+        }
+    }
+
+    public function loadOprsData()
+    {
+        $this->operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();
     }
 
     public function resetAllPublicVariables()

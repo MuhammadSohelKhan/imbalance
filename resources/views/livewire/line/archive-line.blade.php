@@ -1,64 +1,106 @@
 <div class="box">
-  <style type="text/css">
-    .table thead th {
-      color: #354052;
-      background-color: #D8E4BC;
-    }
 
-    #operation1, #operation2, #operation3, #operation4, #operation5 {
-      position: relative;
-    }
+	<style type="text/css">
+		.table thead th {
+			color: #354052;
+			background-color: #D8E4BC;
+		}
 
-    #stageDiv1, #stageDiv2, #stageDiv3, #stageDiv4, #stageDiv5 {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 100;
-    }
+		#operation1, #operation2, #operation3, #operation4, #operation5 {
+			position: relative;
+		}
 
-    .link-secondary {
-        color: #b0bca2;
-    }
+		#stageDiv1, #stageDiv2, #stageDiv3, #stageDiv4, #stageDiv5 {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 100;
+		}
 
-    .link-secondary:hover {
-        color: #addafb;
-    }
-  </style>
+		.link-secondary {
+			color: #b0bca2;
+		}
+
+		.link-secondary:hover {
+			color: #addafb;
+		}
+	</style>
+
 
 	<div class="card">
-		<div class="card-header">
-			<h4 class="card-title">Analytics of Summaries will be added here</h4>
+		<div class="card-header justify-content-between">
+			<h4 class="card-title">Edit Line</h4>
+			<a href="{{ route('lines', $newLine->project_id) }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
-			<table class="table table-vcenter card-table table-striped text-nowrap">
+			<table class="table table-vcenter card-table table-striped text-nowrap table-bordered text-center">
 				<thead>
 					<tr>
-						<th>SL</th>
-						<th>Company</th>
 						<th>Buyer</th>
 						<th>Style</th>
 						<th>Item</th>
-						<th class="w-1">Study Date</th>
-            <th class="w-1">Actions</th>
+						<th>Study Date</th>
+						<th>Floor</th>
+						<th>Line</th>
+						<th>Allowance</th>
+						<th>Actual Production</th>
+						<th class="w-1">Action</th>
 					</tr>
 				</thead>
 				<tbody>
-					@forelse($summaries as $summary)
 					<tr>
-						{{-- <td>{{ $loop->iteration }}</td> --}}
-						<td>{{ $summary->id }}</td>
-						<td><a href="{{ route('lines', $summary->id)}}" class="text-reset" tabindex="-1">{{ $summary->company }}</a></td>
-						<td>{{ $summary->buyer }}</td>
-						<td>{{ $summary->style }}</td>
-						<td>{{ $summary->item }}</td>
-						<td>{{ $summary->study_date }}</td>
-            <td><a href="{{ route('lines', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">View Lines</a> <a href="{{ route('summary.export', $summary->id) }}" class="btn btn-sm btn-info" tabindex="-1">Download</a></td>
+						<td>{{ $newLine->buyer ?? '' }}</td>
+						<td>{{ $newLine->style ?? '' }}</td>
+						<td>{{ $newLine->item ?? '' }}</td>
+						<td>{{ $newLine->study_date ?? '' }}</td>
+						<td>Fl-{{ $newLine->floor ?? '' }}</td>
+						<td>Ln-{{ $newLine->line ?? '' }}</td>
+						<td>{{ $newLine->allowance ?? '' }}</td>
+						<td>{{ $newLine->achieved ?? '' }}</td>
+						<td><a href="#" data-toggle="modal" data-target="#modal-line-operation" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this line">Edit</a>
+						<a href="#" wire:dblclick="deleteLine()" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this line">Delete</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="card">
+		<div class="card-header justify-content-between">
+			<h4 class="card-title">Operations of this Line</h4>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-vcenter card-table table-striped text-nowrap table-bordered text-center">
+				<thead>
+					<tr>
+						<th>SL</th>
+						<th>Operation</th>
+						<th>Machine</th>
+						<th>Avg Cycle Time</th>
+						<th>Cycle Time With Allowance</th>
+						<th>Allocated MP</th>
+						<th class="w-1">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					@forelse($newLine->operations as $index => $opr)
+					<tr>
+						<td>{{ $loop->iteration }}</td>
+						<td>{{ $opr->type ?? '' }}</td>
+						<td>{{ $opr->machine ?? '' }}</td>
+						<td>{{ $opr->average_cycle_time ?? '' }}</td>
+						<td>{{ $opr->cycle_time_with_allowance ?? '' }}</td>
+						<td>{{ $opr->allocated_man_power ?? '' }}</td>
+						<td>@if(!sizeof($opr->stages))<a href="#" data-toggle="modal" data-target="#modal-operations" wire:click="editOpr({{ $index }})" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this operation">Edit</a>@endif
+						<button wire:dblclick="deleteOpr({{ $index }})" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this operation">Delete</button></td>
 					</tr>
 					@empty
 					<tr>
-            <td colspan="6" class="text-center">No data found.</td>
+						<td colspan="7">No data found.</td>
 					</tr>
 					@endforelse
 				</tbody>
@@ -68,45 +110,38 @@
 
 
 
-	<div class="modal modal-blur fade" wire:ignore.self id="modal-summary-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+
+	<div class="modal modal-blur fade" wire:ignore.self id="modal-line-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-white">
           <div class="modal-header">
-            <h5 class="modal-title">New Line Imbalance Operation</h5>
+            <h5 class="modal-title">Edit Copied Line</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>
           @if (session()->has('success'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <ul>
-                <li>{{ session()->get('success') }}</li>
-            </ul>
-            <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
-        </div>
-      @endif
-      @if (session()->has('fail'))
-        <div class="alert alert-danger alert-dismissible" role="alert">
-            <ul>
-                <li>{{ session()->get('fail') }}</li>
-            </ul>
-            <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
-        </div>
-      @endif
+		    <div class="alert alert-success alert-dismissible" role="alert">
+		        <ul>
+		            <li>{{ session()->get('success') }}</li>
+		        </ul>
+		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+		    </div>
+		  @endif
+		  @if (session()->has('fail'))
+		    <div class="alert alert-danger alert-dismissible" role="alert">
+		        <ul>
+		            <li>{{ session()->get('fail') }}</li>
+		        </ul>
+		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+		    </div>
+		  @endif
 
 
-        {{-- START SUMMARY FORM --}}
-          @if($currentStep == 1)
-          <form id="summary-form" wire:submit.prevent="saveSummary">
+        {{-- START LINE FORM --}}
+          <form id="project-form" wire:submit.prevent="updateLine">
           <div class="modal-body">
             <div class="row">
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Company</label>
-                  <input type="text" class="form-control" id="company" name="company" wire:model.lazy="company" placeholder="Write company name">
-                  <span class="text-danger">@error('company') {{ $message }} @enderror</span>
-                </div>
-              </div>
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Buyer</label>
@@ -114,15 +149,15 @@
                   <span class="text-danger">@error('buyer') {{ $message }} @enderror</span>
                 </div>
               </div>
-            </div>
-            <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Style</label>
-                  <input type="text" class="form-control" id="style" name="style" wire:model.lazy="style" placeholder="Write style name">
+                  <input type="text" class="form-control" id="style" name="style" wire:model.lazy="style" placeholder="Write style of the product">
                   <span class="text-danger">@error('style') {{ $message }} @enderror</span>
                 </div>
               </div>
+            </div>
+            <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Item</label>
@@ -130,8 +165,6 @@
                   <span class="text-danger">@error('item') {{ $message }} @enderror</span>
                 </div>
               </div>
-            </div>
-            <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label class="form-label">Study Date</label>
@@ -140,25 +173,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary ml-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Next
-            </button>
-          </div>
-          </form>
-          @endif
-        {{-- END SUMMARY FORM --}}
-
-
-        {{-- START LINE FORM --}}
-          @if($currentStep == 2)
-          <form id="summary-form" wire:submit.prevent="saveLine">
-          <div class="modal-body">
             <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
@@ -194,9 +208,9 @@
             <div class="row">
               <div class="col-lg-6">
                 <div class="mb-3">
-                  <label class="form-label">Summary ID</label>
-                  <input type="number" class="form-control" id="summary_id" name="summary_id" wire:model.lazy="summary_id" disabled="true">
-                  <span class="text-danger">@error('summary_id') {{ $message }} @enderror</span>
+                  <label class="form-label">Project ID</label>
+                  <input type="number" class="form-control" id="project_id" name="project_id" wire:model.lazy="project_id" disabled="true">
+                  <span class="text-danger">@error('project_id') {{ $message }} @enderror</span>
                 </div>
               </div>
             </div>
@@ -211,13 +225,43 @@
             </button>
           </div>
           </form>
-          @endif
         {{-- END LINE FORM --}}
+        </div>
+      </div>
+    </div>
+
+
+
+
+	<div class="modal modal-blur fade" wire:ignore.self id="modal-operations" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border-white">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Operation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            </button>
+          </div>
+          @if (session()->has('success'))
+		    <div class="alert alert-success alert-dismissible" role="alert">
+		        <ul>
+		            <li>{{ session()->get('success') }}</li>
+		        </ul>
+		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+		    </div>
+		  @endif
+		  @if (session()->has('fail'))
+		    <div class="alert alert-danger alert-dismissible" role="alert">
+		        <ul>
+		            <li>{{ session()->get('fail') }}</li>
+		        </ul>
+		        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+		    </div>
+		  @endif
 
 
         {{-- START OPERATION FORM --}}
-          @if($currentStep == 3)
-          <form id="summary-form" wire:submit.prevent="saveOperation(Object.fromEntries(new FormData($event.target)))">
+          <form id="project-form" wire:submit.prevent="updateOperation(Object.fromEntries(new FormData($event.target)))">
           <div class="modal-body">
             <div class="row">
               <div class="col-lg-6">
@@ -295,7 +339,6 @@
             </button>
           </div>
           </form>
-          @endif
         {{-- END OPERATION FORM --}}
         </div>
       </div>

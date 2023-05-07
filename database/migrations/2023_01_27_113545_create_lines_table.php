@@ -15,6 +15,10 @@ class CreateLinesTable extends Migration
     {
         Schema::create('lines', function (Blueprint $table) {
             $table->id();
+            $table->string('buyer')->nullable();
+            $table->string('style')->nullable();
+            $table->string('item')->nullable();
+            $table->date('study_date')->nullable();
             $table->integer('floor')->nullable();
             $table->integer('line')->nullable();
             $table->integer('allowance')->nullable();
@@ -22,7 +26,18 @@ class CreateLinesTable extends Migration
             $table->integer('achieved')->nullable();
             $table->integer('imbalance')->nullable();
             $table->integer('balance')->nullable();
-            $table->foreignId('summary_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->boolean('is_archived')->nullable()->default(0);
+            $table->date('archived_date')->nullable();
+
+            $table->foreignId('project_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('copied_from')->nullable()->constrained('lines')->onUpdate('cascade')->onDelete('set null');
+
+            /*== Associated User ==*/
+            $table->foreignId('created_by')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }

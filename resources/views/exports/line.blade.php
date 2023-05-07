@@ -1,14 +1,14 @@
 <table border="1">
     <thead>
     <tr>
-        <th colspan="9" height="45" bgcolor="#B7DEE8" style="border: 1px solid #000; font-family: 'Times New Roman';">Imbalance check<br>{{ $summary->company }}</th>
+        <th colspan="9" height="45" bgcolor="#B7DEE8" style="border: 1px solid #000; font-family: 'Times New Roman';">Imbalance check<br>{{ $summary->client->name }}</th>
         <th bgcolor="#FABF8F" style="color: #0000FF; border: 1px solid #000; font-family: 'Times New Roman';"><a href="sheet://'Summary'!A1">Back</a></th>
     </tr>
     </thead>
     <tbody>
         <tr>
             <th colspan="2" align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Buyer</th>
-            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $summary->buyer }}</th>
+            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $line->buyer }}</th>
             <th></th>
             <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Floor</th>
             <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $line->floor }}</th>
@@ -18,7 +18,7 @@
         </tr>
         <tr>
             <th colspan="2" align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Style</th>
-            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $summary->style }}</th>
+            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $line->style }}</th>
             <th></th>
             <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Line</th>
             <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $line->line }}</th>
@@ -28,10 +28,10 @@
         </tr>
         <tr>
             <th colspan="2" align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Item</th>
-            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $summary->item }}</th>
+            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $line->item }}</th>
             <th></th>
             <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Study Date</th>
-            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $summary->study_date }}</th>
+            <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $line->study_date }}</th>
             <th></th>
             <th colspan="2" align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">Imbalance%</th>
             <th align="center" valign="middle" style="border: 1px solid #000; font-family: 'Times New Roman';">{{ $imbalance }}%</th>
