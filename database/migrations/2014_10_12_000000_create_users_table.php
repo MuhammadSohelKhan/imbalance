@@ -21,10 +21,22 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+
+            /*== Associated User ==*/
+            $table->foreignId('created_by')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+
             $table->timestamps();
+            $table->softDeletes();
         });
 
-        $sql = 'INSERT INTO `users`(`id`, `name`, `email`, `role`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES (NULL,"MASRUR BIN MORSHED","masrurbinmorshed@gmail.com","Master",NOW(),"$2y$10$enVDVB2AG1D0evG9NVRVyu4f.4f8mcOqL6aTYiazTdlIy4CExaCuC",NULL,NOW(),NOW()), (NULL,"Azim Mohammad","azim_ipe@yahoo.com","superadmin",NOW(),"$2y$10$DGv.57dXwy/Dxo0.l0wLeuXk0bQgVxR.d0eIlboJzsCLtt5jgr0QG",NULL,NOW(),NOW())'; //Pass1: mBm@PT#2021; Pass2: Azim@3244 
+        $sql = 'INSERT INTO `users`(`id`, `name`, `email`, `role`, `email_verified_at`, `password`, `remember_token`, `created_by`, `updated_by`, `deleted_by`, `created_at`, `updated_at`, `deleted_at`) 
+            VALUES 
+            (NULL,"MASRUR BIN MORSHED","masrurbinmorshed@gmail.com","Master",NOW(),"$2y$10$enVDVB2AG1D0evG9NVRVyu4f.4f8mcOqL6aTYiazTdlIy4CExaCuC",NULL,NULL,NULL,NULL,NOW(),NOW(),NULL), 
+            (NULL,"Azim Mohammad","azim_ipe@yahoo.com","superadmin",NOW(),"$2y$10$DGv.57dXwy/Dxo0.l0wLeuXk0bQgVxR.d0eIlboJzsCLtt5jgr0QG",NULL,NULL,NULL,NULL,NOW(),NOW(),NULL)'; 
+                //Pass1: mBm@PT#2021; Pass2: Azim@3244 
+
         DB::connection()->getPdo()->exec($sql);
     }
 

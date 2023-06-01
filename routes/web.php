@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function ()
 	Route::get('client/{client_id}/projects', [App\Http\Controllers\HomeController::class, 'projects'])->name('projects');
 	Route::get('/project/{project_id}/lines', [App\Http\Controllers\HomeController::class, 'lines'])->name('lines');
 	Route::get('/archive-line/{line_id}', [App\Http\Controllers\LineController::class, 'archiveLine'])->name('archive_line');
-	Route::get('/edit-line/{line_id}', \App\Http\Livewire\Line\ArchiveLine::class)->name('edit_line');
+	Route::get('/edit-line/{line_id}', \App\Http\Livewire\Line\EditLine::class)->name('edit_line');
 	Route::get('/line/{line}/operations', [App\Http\Controllers\HomeController::class, 'operation'])->name('operations');
 	//Route::get('/summary/{summary}/lines', [App\Http\Controllers\HomeController::class, 'line'])->name('lines');
 

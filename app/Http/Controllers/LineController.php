@@ -18,16 +18,22 @@ class LineController extends Controller
      */
     public function index()
     {
-        //
+        abort(404);
     }
 
     public function archiveLine($line_id)
     {
         $aUser = auth()->user();
+        if ($aUser->role == 'viewer') abort(403);
+
         $copiedLine = Line::with(['operations' => function ($q)
         {
             $q->with('stages')->withCount('stages');
         }])->withCount('operations')->findOrFail($line_id);
+
+        if (in_array($aUser->role,['CiC','user']) && $aUser->client_id != $copiedLine->project->client_id) {
+            abort(403);
+        }
 
         $newLine = Line::create([
             'buyer' => $copiedLine->buyer,
@@ -90,7 +96,7 @@ class LineController extends Controller
      */
     public function create()
     {
-        //
+        abort(404);
     }
 
     /**
@@ -101,7 +107,7 @@ class LineController extends Controller
      */
     public function store(StoreLineRequest $request)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -112,7 +118,7 @@ class LineController extends Controller
      */
     public function show(Line $line)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -123,7 +129,7 @@ class LineController extends Controller
      */
     public function edit(Line $line)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -135,7 +141,7 @@ class LineController extends Controller
      */
     public function update(UpdateLineRequest $request, Line $line)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -146,6 +152,6 @@ class LineController extends Controller
      */
     public function destroy(Line $line)
     {
-        //
+        abort(404);
     }
 }

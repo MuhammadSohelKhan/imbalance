@@ -30,7 +30,12 @@ class Projects extends Component
 
     public function saveProject()
     {
-        if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
+        if ($this->aUser->role == 'viewer') abort(403);
+
+        if ($this->formStatus == 'Add New' && $this->aUser->role == 'CiC') abort(403);
+
+        if (in_array($this->aUser->role, ['Master','superadmin','admin','CiC'])) {
+
             $projectData = $this->validate([
                 'start_date' => 'required|date',
                 'renew_date' => 'nullable|date|after:start_date',
@@ -63,9 +68,13 @@ class Projects extends Component
         }
     }
 
+
+
     public function editProject($id, $start_date, $renew_date, $end_date, $assigned_officer, $is_active, $present_situation, $goal)
     {
-        if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
+        if ($this->aUser->role == 'viewer') abort(403);
+
+        if (in_array($this->aUser->role, ['Master','superadmin','admin','CiC'])) {
             $this->projID = $id;
             $this->start_date = $start_date;
             $this->renew_date = $renew_date;
@@ -81,8 +90,12 @@ class Projects extends Component
         }
     }
 
+
+
     public function deleteProject($id)
     {
+        if ($this->aUser->role == 'viewer') abort(403);
+
         if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
             $deletedProject = Project::where('id', $id)->first()->delete();
             if ($deletedProject) {
@@ -92,6 +105,8 @@ class Projects extends Component
             session()->flash('fail', 'You don\'t have access to do this.');
         }
     }
+
+
 
     public function resetAllPublicVariables()
     {

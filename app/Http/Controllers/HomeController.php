@@ -43,6 +43,9 @@ class HomeController extends Controller
     public function projects($client_id)
     {
         $aUser = auth()->user();
+        if (in_array($aUser->role,['CiC','user','viewer']) && $aUser->client_id != $client_id) {
+            abort(403);
+        }
         $ctrlClient = Client::findOrFail($client_id);
 
         return view('project', compact('ctrlClient', 'aUser'));
@@ -57,6 +60,9 @@ class HomeController extends Controller
     {
         $aUser = auth()->user();
         $ctrlProject = Project::findOrFail($project_id);
+        if (in_array($aUser->role,['CiC','user','viewer']) && $aUser->client_id != $ctrlProject->client_id) {
+            abort(403);
+        }
 
         return view('line', compact('ctrlProject', 'aUser'));
     }
@@ -68,13 +74,23 @@ class HomeController extends Controller
      */
     public function operation($line_id)
     {
+        $aUser = auth()->user();
         $ctrlLine = Line::findOrFail($line_id);
-        return view('operation', compact('ctrlLine'));
+        if (in_array($aUser->role,['CiC','user','viewer']) && $aUser->client_id != $ctrlLine->project->client_id) {
+            abort(403);
+        }
+        
+        return view('operation', compact('ctrlLine','aUser'));
     }
 
     public function exportSummary($projid)
     {
+        $aUser = auth()->user();
         $project = Project::findOrFail($projid);
+        if (in_array($aUser->role,['CiC','user','viewer']) && $aUser->client_id != $project->client_id) {
+            abort(403);
+        }
+
         return Excel::download(new SummaryExport($project->id), 'imbalance-analysis.xlsx');
     }
 
@@ -113,20 +129,27 @@ class HomeController extends Controller
     public function getUserPage(Request $request)
     {
         $aUser = auth()->user();
-        if (in_array($aUser->role, ['Master','superadmin'])) {
+        if (in_array($aUser->role, ['Master','superadmin','admin','CiC'])) {
+            $permRoles = explode(',',$this->permittedRoles($aUser->role));
+
             $user = "";
+
             if ($request->u) {
                 $request->validate(['u'=>'exists:users,email']);
-                $user = User::where('email', $request->u)->select('id','name','email','role')->first();
+                $user = User::where('email', $request->u)->select('id','name','email','role','client_id','project_id','assigned_to')->first();
 
-                if ($user->email == "masrurbinmorshed@gmail.com" && $aUser->role != "Master") {
+                // Securing Master user
+                if ($user->email == "masrurbinmorshed@gmail.com" && $aUser->email != "masrurbinmorshed@gmail.com") {
                     abort(404);
                 }
+
+                // 'hdn' means HIDDEN
                 session()->flash('hdn_edit_user',TRUE);
                 session()->flash('hdn_edit_user_id', $user->id);
                 session()->flash('hdn_edit_user_email',$user->email);
             }
-            return view('users.create', compact('aUser', 'user'));
+
+            return view('users.create', compact('aUser','permRoles','user'));
         } else {
             abort(404);
         }
@@ -135,13 +158,17 @@ class HomeController extends Controller
     public function getAllUserPage(Request $request)
     {
         $aUser = auth()->user();
-        if (in_array($aUser->role, ['Master','superadmin'])) {
-            $users = User::select('id','name','email','role');
+        if (in_array($aUser->role, ['Master','superadmin','admin','CiC'])) {
+            $permRoles = explode(',',$this->permittedRoles($aUser->role));
+            $users = User::select('id','name','email','role','client_id','project_id','assigned_to')->with(['client:id,client_code','assignedTo:id,name'])->whereIn('role',$permRoles);
 
-            if (in_array($aUser->role, ['superadmin'])) {
-                $users = $users->where('role','!=','Master');
+            if ($aUser->role == 'CiC') {
+                $users = $users->where('assigned_to', $aUser->id)->orWhere('client_id',$aUser->client_id)->orWhere('id', $aUser->id);
             }
-            $users = $users->get();
+            $users = $users->get()->mapToGroups(function ($item)
+            {
+                return [$item['role'] => $item];
+            });/*dd($users['CiC'][0]);*/
 
             return view('users.all_users', compact('users'));
         } else {
@@ -152,14 +179,32 @@ class HomeController extends Controller
     public function postUser(Request $request)
     {
         $aUser = auth()->user();
-        if (in_array($aUser->role, ['Master','superadmin'])) {
+
+        if (in_array($aUser->role, ['Master','superadmin','admin','CiC'])) {
+            $permRoles = $this->permittedRoles($aUser->role);
+
             $data = $request->validate([
                 'name' => 'required|string',
                 'email' => 'required|string|email|unique:users,email,'.session()->get('hdn_edit_user_id'),
-                'role' => 'required|string|in:superadmin,admin,user',
+                'role' => 'required|string|in:'.$permRoles,
             ]);
 
-            if ($data['email'] == "masrurbinmorshed@gmail.com" && $aUser->role != "Master") {
+            if (in_array($request->role, ['CiC', 'user', 'viewer'])) {
+                $request->validate([
+                    'client_code' => 'required|string|regex:/^CL-[A-Z]{2}-(?!000)\d{3}$/|exists:clients,client_code',
+                ]);
+                $data['client_id'] = Client::select('id')->where('client_code', $request->client_code)->first()->id;
+            } else { $data['client_id'] = NULL; }
+
+            if ($request->role == "user") {
+                $request->validate([
+                    'user_id' => 'required|exists:users,id',
+                ]);
+                $data['assigned_to'] = $request->user_id;
+            } else { $data['assigned_to'] = NULL; }
+
+            // Securing Master user
+            if ($data['email'] == "masrurbinmorshed@gmail.com" && $aUser->email != "masrurbinmorshed@gmail.com") {
                 abort(404);
             }
 
@@ -190,7 +235,8 @@ class HomeController extends Controller
         $aUser = auth()->user();
         if (in_array($aUser->role, ['Master','superadmin'])) {
 
-            if ($user->email == "masrurbinmorshed@gmail.com" && $aUser->role != "Master") {
+            // Securing Master user
+            if ($user->email == "masrurbinmorshed@gmail.com" && $aUser->email != "masrurbinmorshed@gmail.com") {
                 abort(404);
             }
             
@@ -200,5 +246,28 @@ class HomeController extends Controller
         } else {
             abort(404);
         }
+    }
+
+    public function permittedRoles($aUserRole)
+    {
+        switch ($aUserRole) {
+            case 'Master':
+                $permRoles = 'Master,superadmin,admin,CiC,user,viewer';
+                break;
+
+            case 'superadmin':
+                $permRoles = 'superadmin,admin,CiC,user,viewer';
+                break;
+
+            case 'admin':
+                $permRoles = 'admin,CiC,user,viewer';
+                break;
+
+            default:
+                $permRoles = 'CiC,user,viewer';
+                break;
+        }
+
+        return $permRoles;
     }
 }

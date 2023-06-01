@@ -28,20 +28,24 @@ class Lines extends Component
             return abort(404);
         }
 
-        $lines = Line::where('project_id', $this->project_id)->where('is_archived', $this->lineStatus[1]);
+        $lines = Line::where('project_id', $this->project_id)
+            ->where('is_archived', $this->lineStatus[1])
+            ->orderBy('id', 'asc')->get();
 
-        if ($this->aUser->role == 'user') {
+        /*if ($this->aUser->role == 'user') {
             $lines = $lines->where('created_by', $this->aUser->id);
         }
-    	$lines = $lines->orderBy('id', 'asc')->get();
+    	$lines = $lines->orderBy('id', 'asc')->get();*/
 
 		return view('livewire.line.lines', compact('project', 'lines'));
     }
+
 
     public function toggleLineStatus()
     {
         $this->lineStatus = ($this->lineStatus[1] == 0) ? ["Archived", 1] : ["Active", 0];
     }
+
 
     public function resetModalForm()
     {
@@ -51,8 +55,11 @@ class Lines extends Component
     	$this->dispatchBrowserEvent('resetModalForm');
     }
 
+
     public function saveLine()
     {
+        if ($this->aUser->role == 'viewer') abort(403);
+
         $lineData = $this->validate([
             'buyer' => 'required|string',
             'style' => 'required|string',
@@ -80,6 +87,8 @@ class Lines extends Component
 
     public function saveOperation($data)
     {
+        if ($this->aUser->role == 'viewer') abort(403);
+
         $operationData = $this->validate([
             'type' => 'required|string',
             'machine' => 'required|string',
@@ -158,6 +167,7 @@ class Lines extends Component
             session()->flash('fail', 'Unable to save.');
         }
     }
+
 
     public function resetAllPublicVariables()
     {

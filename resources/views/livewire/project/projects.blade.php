@@ -67,12 +67,13 @@
             </td>
 						<td>{{ $project->assigned_officer }}</td>
             <td><a href="{{ route('lines', $project->id) }}" class="btn btn-sm btn-info" tabindex="-1" title="See lines of this project">View Lines</a>
+              <a href="{{ route('summary.export', $project->id) }}" class="btn btn-sm btn-info" tabindex="-1" title="Download imbalance summary of this project">Download</a>
 
-              @if(in_array($aUser->role, ['Master','superadmin','admin'])) 
-                <a href="{{ route('summary.export', $project->id) }}" class="btn btn-sm btn-info" tabindex="-1" title="Download imbalance summary of this project">Download</a>
+              @if(in_array($aUser->role, ['Master','superadmin','admin','CiC'])) 
                 <a href="#" data-toggle="modal" data-target="#modal-project-operation" wire:click="editProject({{ $project->id }}, '{{ $project->start_date }}', '{{ $project->renew_date }}', '{{ $project->end_date }}', '{{ $project->assigned_officer }}', {{ $project->is_active }}, '{{ $project->present_situation }}', '{{ $project->goal }}')" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this project details">Edit</a>
-
+                @if($aUser->role != 'CiC')
                 <a href="#" wire:dblclick="deleteProject({{ $project->id }})" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this project">Delete</a>
+                @endif
               @endif
             </td>
 					</tr>
@@ -88,6 +89,7 @@
 
 
 
+  @if($aUser->role != 'viewer')
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-project-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-white">
@@ -207,4 +209,5 @@
       </div>
     </div>
   </div>
+  @endif
 </div>

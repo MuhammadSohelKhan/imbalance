@@ -29,18 +29,8 @@ class Operations extends Component
     public function render()
     {
         $this->dispatchBrowserEvent('refreshJSVariables');
-    	/*$line = Line::with(['project' => function ($q)
-        {
-            $q->select('id','client_id')->with('client:id,name');
-        }])->findOrFail($this->line_id);
 
-    	if (! $line) {
-    		return abort(404);
-    	}
-
-    	$operations = Operation::where('line_id', $this->line_id)->with('stages')->withCount('stages')->orderBy('id', 'asc')->get();*/
-
-        return view('livewire.operation.operations'/*, compact('line', 'operations')*/);
+        return view('livewire.operation.operations');
     }
 
     public function resetModalForm()
@@ -58,6 +48,8 @@ class Operations extends Component
 
     public function saveOperation($data)
     {
+        if ($this->aUser->role=='viewer' || $this->aUser->role=='user' && $this->line->created_by != $this->aUser->id || $this->line->is_archived) abort(403);
+
         $operationData = $this->validate([
             'type' => 'required|string',
             'machine' => 'required|string',
@@ -141,13 +133,8 @@ class Operations extends Component
     {
         $this->line = Line::where('id',$this->line_id)->with(['project' => function ($q)
             {
-                $q->select('id','client_id')->with('client:id,name');
-            }]);
-        if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
-            $this->line = $this->line->first();
-        } else {
-            $this->line = $this->line->where('is_archived', 0)->where('created_by', $this->aUser->id)->first();
-        }
+                $q->with('client');
+            }])->first();
 
         if (! $this->line) {
             return abort(404);

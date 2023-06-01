@@ -22,6 +22,9 @@ class User extends Authenticatable
         'email',
         'role',
         'password',
+        'client_id',
+        'project_id',
+        'assigned_to',
         'email_verified_at',
     ];
 
@@ -43,4 +46,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function assignedTo()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
 }

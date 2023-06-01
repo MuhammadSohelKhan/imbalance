@@ -37,7 +37,7 @@
     <div class="card-header justify-content-between">
       <h4 class="card-title">All Clients</h4>
 
-      @if(in_array($aUser->role, ['Master','superadmin']))
+      @if(in_array($aUser->role, ['Master','superadmin','admin','CiC']))
       <a href="{{ route('users.all') }}" class="btn btn-sm btn-secondary" title="See all users">Users</a>
       @endif
     </div>
@@ -76,8 +76,9 @@
             <td><a href="{{ route('projects', $client->id) }}" class="btn btn-sm btn-info" tabindex="-1" title="See projects of this client">View Projects</a>
               @if(in_array($aUser->role, ['Master','superadmin','admin']))
                 <a href="#" data-toggle="modal" data-target="#modal-client-operation" wire:click="editClient({{ $client->id }}, '{{ $client->name }}', '{{ $client->client_code }}', '{{ $client->head_office }}', '{{ $client->total_factories }}', '{{ $client->owner }}', '{{ $client->estd_date }}', '{{ $client->is_active }}')" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this client details">Edit</a>
-
+                @if($aUser->role != 'admin')
                 <a href="#" wire:dblclick="deleteClient({{ $client->id }})" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this client">Delete</a>
+                @endif
               @endif
             </td>
 					</tr>
@@ -93,15 +94,16 @@
 
 
 
+  @if($aUser->role != 'viewer')
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-client-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content border-white">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ $formStatus }} Client Details</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-            </button>
-          </div>
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content border-white">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ $formStatus }} Client Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
         @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible" role="alert">
             <ul>
@@ -207,4 +209,5 @@
       </div>
     </div>
   </div>
+  @endif
 </div>

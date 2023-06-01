@@ -35,6 +35,16 @@
     });
 
 
+    window.addEventListener('closeLineModal', function () {
+      $('#modal-line-operation').modal('hide');
+    });
+
+
+    window.addEventListener('closeOprModal', function () {
+      $('#modal-operations').modal('hide');
+    });
+
+
     function startTimer(starter) {
       stepsCount++;
       starter.innerHTML = 'Pause';

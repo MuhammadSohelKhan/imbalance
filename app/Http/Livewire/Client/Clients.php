@@ -20,7 +20,11 @@ class Clients extends Component
         }
 
         $this->dispatchBrowserEvent('refreshJSVariables');
-    	$clients = Client::orderBy('is_active', 'desc')->orderBy('name', 'asc')->get();
+    	$clients = Client::orderBy('is_active', 'desc')->orderBy('name', 'asc');
+        if (in_array($this->aUser->role,['CiC','user','viewer'])) {
+            $clients = $clients->where('id',$this->aUser->client_id);
+        }
+        $clients = $clients->get();
         return view('livewire.client.clients', compact('clients'));
     }
 
@@ -32,10 +36,12 @@ class Clients extends Component
 
     public function saveClient()
     {
+        if ($this->aUser->role == 'viewer') abort(403);
+
         if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
             $clientData = $this->validate([
                 'name' => 'required|string|max:100|unique:clients,name,'.$this->clID,
-                'client_code' => 'required|string|size:7|unique:clients,client_code,'.$this->clID,
+                'client_code' => 'required|string|regex:/^CL-[A-Z]{2}-(?!000)\d{3}$/|unique:clients,client_code,'.$this->clID,
                 'head_office' => 'nullable|string|max:500',
                 'total_factories' => 'nullable|integer|min:1',
                 'owner' => 'nullable|string|max:100',
@@ -72,6 +78,8 @@ class Clients extends Component
 
     public function editClient($id, $name, $client_code, $head_office, $total_factories, $owner, $estd_date, $is_active)
     {
+        if ($this->aUser->role == 'viewer') abort(403);
+
         if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
             $this->clID = $id;
             $this->name = $name;
@@ -90,7 +98,9 @@ class Clients extends Component
 
     public function deleteClient($id)
     {
-        if (in_array($this->aUser->role, ['Master','superadmin','admin'])) {
+        if ($this->aUser->role == 'viewer') abort(403);
+
+        if (in_array($this->aUser->role, ['Master','superadmin'])) {
             $deletedClient = Client::where('id', $id)->first()->delete();
             if ($deletedClient) {
                 session()->flash('success', 'Data deleted successfully.');

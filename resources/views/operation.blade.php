@@ -11,7 +11,8 @@
 		</div>
 	</div>
 
-  @if(! $ctrlLine->is_archived && $ctrlLine->project->is_active)
+  @if(!$ctrlLine->is_archived && $ctrlLine->project->is_active && $aUser->role != 'viewer')
+    @if($aUser->role!='user' || $ctrlLine->created_by==$aUser->id)
 	<div class="row row-deck row-cards">
 		<div class="col-sm-6 col-xl-4">
 			<div class="card card-sm">
@@ -30,6 +31,7 @@
 			</div>
 		</div>
 	</div>
+    @endif
   @endif
 
 	<livewire:operation.operations :line_id="$ctrlLine->id">

@@ -34,7 +34,9 @@
 	<div class="card">
 		<div class="card-header justify-content-between">
 			<h4 class="card-title">Analysis of Line-{{ $line->line }}</h4>
-      		<a href="{{ route('lines', $line->project_id) }}" class="btn btn-sm btn-secondary">Back</a>
+      @if($line->project->client->is_active && $line->project->is_active && !$line->is_archived && $aUser->role=='user'&& $line->created_by==$aUser->id || $line->project->client->is_active && $line->project->is_active && !$line->is_archived && in_array($aUser->role,['Master','superadmin','admin','CiC']))
+      	<a href="{{ route('edit_line', $line->id) }}" class="btn btn-sm btn-warning" title="Edit this line and operation data">Edit</a>
+      @endif
 		</div>
 		<div class="table-responsive">
 			<table id="operations_table" class="table table-vcenter card-table table-striped table-bordered text-center">
@@ -176,6 +178,7 @@
 	@endif
 
 
+  @if($aUser->role != 'viewer')
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-white">
@@ -290,7 +293,8 @@
 
         </div>
       </div>
-    </div>
+  </div>
+  @endif
 
 
 	{{-- Capacity Graph --}}

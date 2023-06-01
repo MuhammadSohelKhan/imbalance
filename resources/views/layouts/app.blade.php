@@ -46,7 +46,7 @@
                 Home
               </a>
 
-              @if(in_array(auth()->user()->role, ['Master','superadmin']))
+              @if(in_array(auth()->user()->role, ['Master','superadmin','admin','CiC']))
               <a class="dropdown-item" href="{{ route('user.get') }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M2 21v-2a4 4 0 0 1 4 -4h5a4 4 0 0 1 4 4v2"></path><line x1="16" y1="11" x2="22" y2="11"></line><line x1="19" y1="8" x2="19" y2="14"></line></svg>
                 Add User
@@ -96,6 +96,7 @@
   </div>
 
 <!-- Libs JS -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="{{ asset('dist/js/bootstrap.bundle.min.js') }}"></script>
 
 @livewireScripts

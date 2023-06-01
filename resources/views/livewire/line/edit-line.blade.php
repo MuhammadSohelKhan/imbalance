@@ -29,9 +29,29 @@
 	</style>
 
 
+  <div>
+    @if (session()->has('success'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <ul>
+            <li>{{ session()->get('success') }}</li>
+        </ul>
+        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+    </div>
+    @endif
+    @if (session()->has('fail'))
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <ul>
+            <li>{{ session()->get('fail') }}</li>
+        </ul>
+        <a href="#" class="pt-3 close" data-dismiss="alert" aria-label="close" style="font-size: 2rem;">&times;</a>
+    </div>
+    @endif
+  </div>
+
+
 	<div class="card">
 		<div class="card-header justify-content-between">
-			<h4 class="card-title">Edit Line</h4>
+			<h4 class="card-title">Edit {{($newLine->copied_from)?'Copied':''}} Line</h4>
 			<a href="{{ route('lines', $newLine->project_id) }}" class="btn btn-sm btn-secondary">Back</a>
 		</div>
 		<div class="table-responsive">
@@ -59,8 +79,12 @@
 						<td>Ln-{{ $newLine->line ?? '' }}</td>
 						<td>{{ $newLine->allowance ?? '' }}</td>
 						<td>{{ $newLine->achieved ?? '' }}</td>
-						<td><a href="#" data-toggle="modal" data-target="#modal-line-operation" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this line">Edit</a>
-						<a href="#" wire:dblclick="deleteLine()" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this line">Delete</a></td>
+						<td>
+              @if($aUser->role != 'viewer')
+              <a href="#" data-toggle="modal" data-target="#modal-line-operation" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this line">Edit</a>
+						  <a href="#" wire:dblclick="deleteLine()" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this line">Delete</a>
+              @endif
+            </td>
 					</tr>
 				</tbody>
 			</table>
@@ -72,6 +96,7 @@
 	<div class="card">
 		<div class="card-header justify-content-between">
 			<h4 class="card-title">Operations of this Line</h4>
+      <a href="{{ route('operations', $newLine->id) }}" class="btn btn-sm btn-primary">Add New</a>
 		</div>
 		<div class="table-responsive">
 			<table class="table table-vcenter card-table table-striped text-nowrap table-bordered text-center">
@@ -95,8 +120,12 @@
 						<td>{{ $opr->average_cycle_time ?? '' }}</td>
 						<td>{{ $opr->cycle_time_with_allowance ?? '' }}</td>
 						<td>{{ $opr->allocated_man_power ?? '' }}</td>
-						<td>@if(!sizeof($opr->stages))<a href="#" data-toggle="modal" data-target="#modal-operations" wire:click="editOpr({{ $index }})" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this operation">Edit</a>@endif
-						<button wire:dblclick="deleteOpr({{ $index }})" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this operation">Delete</button></td>
+						<td>
+              @if($aUser->role != 'viewer')
+              <a href="#" data-toggle="modal" data-target="#modal-operations" wire:click="editOpr({{ $index }})" class="btn btn-sm btn-warning" tabindex="-1" title="Edit this operation">Edit</a>
+						  <button wire:dblclick="deleteOpr({{ $index }})" class="btn btn-sm btn-danger" tabindex="-1" title="Double click to delete this operation">Delete</button>
+              @endif
+            </td>
 					</tr>
 					@empty
 					<tr>
@@ -110,12 +139,12 @@
 
 
 
-
+  @if($aUser->role != 'viewer')
 	<div class="modal modal-blur fade" wire:ignore.self id="modal-line-operation" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-white">
           <div class="modal-header">
-            <h5 class="modal-title">Edit Copied Line</h5>
+            <h5 class="modal-title">Edit {{($newLine->copied_from)?'Copied':''}} Line</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="resetModalForm">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
@@ -295,11 +324,50 @@
                 </div>
               </div>
             </div>
-                <label class="mb-2 mt-4">
+                {{-- <label class="mb-2 mt-4">
                   <input class="form-check-input" type="checkbox" id="keep_data" wire:model.lazy="keep_data" checked="true">
                   <span class="form-check-label"> Keep these data</span>
-                </label>
+                </label> --}}
           </div>
+
+          @if($editStage)
+          @php $s=0; @endphp
+          @foreach($toUpdateOpr->stages as $k => $val) 
+          <div id="operation{{$k+1}}" class="modal-body">
+            <div class="row">
+              <h3 class="text-muted">Operation-{{$k+1}}</h3>
+            </div>
+            <div id="stage{{$k+1}}" class="row offset-1">
+              <div id="stageDiv{{$k+1}}" class="d-flex align-items-center justify-content-end px-6">
+                @if($k && ($k+1) == sizeof($toUpdateOpr->stages))<a href="#" class="btn btn-sm btn-danger mt-4" wire:click="deleteStage({{$k}})">X</a>@endif
+              </div>
+              {{-- <div id="stageDiv{{$k+1}}"></div> --}}
+              <div class="col-2 px-1">
+                <input id="step{{$s+1}}" name="step{{$s+1}}" wire:model.lazy="step{{$s+1}}" class="w-100" type="number" required>
+              </div>
+              <div class="col-2 px-1">
+                <input id="step{{$s+2}}" name="step{{$s+2}}" wire:model.lazy="step{{$s+2}}" class="w-100" type="number" required>
+              </div>
+              <div class="col-2 px-1">
+                <input id="step{{$s+3}}" name="step{{$s+3}}" wire:model.lazy="step{{$s+3}}" class="w-100" type="number" required>
+              </div>
+              <div class="col-2 px-1">
+                <input id="step{{$s+4}}" name="step{{$s+4}}" wire:model.lazy="step{{$s+4}}" class="w-100" type="number" required>
+              </div>
+              <div class="col-2 px-1">
+                <input id="step{{$s+5}}" name="step{{$s+5}}" wire:model.lazy="step{{$s+5}}" class="w-100" type="number" required>
+              </div>
+            </div>
+          </div>
+          @php $s+=5; @endphp
+          @endforeach
+          <div class="modal-body">
+            <div class="row">
+              <h1 id="showTimer" class="col-4 offset-4 text-center">00:00</h1>
+            </div>
+            <a id="playTimer" class="col-2 offset-5 text-white btn btn-warning" onclick="event.preventDefault(); startTimer(this);">Play</a>
+          </div>
+          @else
           <div id="operation1" class="modal-body">
           	<div class="row">
           		<h3 class="text-muted">Operation-1</h3>
@@ -329,6 +397,8 @@
           	</div>
           	<a id="playTimer" class="col-2 offset-5 text-white btn btn-warning" onclick="event.preventDefault(); startTimer(this);">Play</a>
           </div>
+          @endif
+
           <div class="modal-footer">
             <button type="reset" class="btn btn-link link-secondary" data-dismiss="modal" wire:click="resetModalForm">
               Cancel
@@ -342,5 +412,6 @@
         {{-- END OPERATION FORM --}}
         </div>
       </div>
-    </div>
+  </div>
+  @endif
 </div>
